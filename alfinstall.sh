@@ -499,6 +499,11 @@ echo
     echo "Downloading maintenance shutdown script..."
     $SUDO curl -# -o $ALF_HOME/scripts/ams.sh $BASE_DOWNLOAD/scripts/ams.sh
   fi
+  if [ ! -f "$ALF_HOME/scripts/remote-script.sh" ]; then
+	echo "Downloading script to install remotly ..."
+	$SUDO curl -# -o $ALF_HOME/scripts/remote-script.sh $BASE_DOWNLOAD/scripts/remote-script.sh
+  fi
+  
   $SUDO chmod u+x $ALF_HOME/scripts/*.sh
 
   # Keystore
@@ -622,6 +627,59 @@ fi
 $SUDO chown -R $ALF_USER:$ALF_USER $ALF_HOME
 if [ -d "$ALF_HOME/www" ]; then
    $SUDO chown -R www-data:root $ALF_HOME/www
+fi
+
+if [ "$installpg" = y ]; then
+	echo
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo "Install PostgreSQL Engine."
+	echo "You have choice to use PSQL Connector, do you want to install a PSQL Server ? "
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+
+	read -e -p "Do you want install PostgreSQL Server${ques} [y/n] " -i "n" installpsql
+	if [ "$installpsql" = "y" ]; then
+		read -e -p "Where (127.0.0.1 for local installation) ?" -i "127.0.0.1" psqlserver
+		read -e -p "Root password for $psqlserver/$psqlmask ?" psqlroot
+		read -e -p "Network interface to accessing to psql server (eth0) ?" -i "eth0" psqliface
+		
+		localip=`ifconfig $psqliface | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+		localmask=`ifconfig ^$psqliface | sed -rn '2s/ .*:(.*)$/\1/p'`
+		localnet="$localip/$localmask"
+		
+		#Update postgresl script with correct vars
+		if [ -f $ALF_HOME/scripts/postgresql.sh ]; then
+			# Prepare PSQL script installer
+			sed -i.bak -e "s/export ALFRESCOSERVER=.*/export ALFRESCOSERVER=$localnet/g" $ALF_HOME/scripts/postgresql.sh
+			# Prepare SEND-SCRIPT
+			localpath="$ALF_HOME/scripts"
+			fullpath="$localpath/postgresql.sh"
+			
+			sed -i.bak -e "s/set remoteip=.*/set remoteip=$psqlserver/g" $ALF_HOME/scripts/remote-script.sh
+			sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$psqlroot/g" $ALF_HOME/scripts/remote-script.sh
+			sed -i.bak -e "s/set localpath=.*/set localpath=$localpath/g" $ALF_HOME/scripts/remote-script.sh
+			sed -i.bak -e "s/set filename=.*/set filename=postgresql.sh/g" $ALF_HOME/scripts/remote-script.sh
+			sed -i.bak -e "s/set fullpath=.*/set remoteip=$fullpath/g" $ALF_HOME/scripts/remote-script.sh
+
+			# send file and execute to remote server
+			$ALF_HOME/scripts/remote-script.sh
+			
+		else
+			echored "postgresql installation script not found."
+			echored "You must install it manually".
+		fi
+
+		
+		read -e -p "Do you want to update your alfresco-global.properties file ?[y/n]" -i "n" alfupdate
+		if ["$update"="y"]; then
+			sed -i.bak "s/db.driver=.*/db.driver=org.postgresql.Driver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			sed -i.bak "s/db.username=.*/db.username=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			sed -i.bak "s/db.password=.*/db.password=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			sed -i.bak "s/db.name=.*/db.name=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			sed -i.bak "s/db.url=.*/db.jdbc:postgresql://$psqlserver:5432/${db.name}/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		fi
+	else 
+		echored "You have installed and/or configured your PSQL Server manually"
+	fi
 fi
 
 echo

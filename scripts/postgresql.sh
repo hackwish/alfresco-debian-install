@@ -92,7 +92,7 @@ if ["$alfremote" = "y"]; then
 	psqlversion=${longpsqlversion%.*}
 		
 	echogreen "PSQL Version $psqlversion dectected"
-	echoblue "Path to access pg_hba.conf must be /etc/postgresql/psql_version/main/pg_hba.conf"
+	echoblue "Path to access pg_hba.conf must be /etc/postgresql/$psqlversion/main/pg_hba.conf"
 	
 	psqlpath="/etc/postgresql/$psqlversion/main/pg_hba.conf"
 	pghba="host alfresco alfresco $ALFRESCOSERVER password"
