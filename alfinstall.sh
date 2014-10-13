@@ -6,11 +6,6 @@
 # Distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License (CC BY-SA 3.0)
 # -------
 
-export ALF_HOME=/opt/alfresco
-export CATALINA_HOME=$ALF_HOME/tomcat
-export ALF_USER=alfresco
-export APTVERBOSITY="-qq -y"
-
 export BASE_DOWNLOAD=https://raw.githubusercontent.com/loftuxab/alfresco-ubuntu-install/master
 export KEYSTOREBASE=http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/keystore
 
@@ -90,6 +85,30 @@ else
 	export $SUDO=
 fi
 
+export APTVERBOSITY="-qq -y"
+
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo "Installing Method ..."
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo
+read -e -p "Use maximum system package (all except swftools)${ques} [y/n] " -i "n" usepack
+if [ "$usepack" = "y" ]; then
+	export ALF_HOME=/opt/alfresco
+	export CATALINA_HOME=/usr/share/tomcat7
+	export CATALINA_BASE=/var/lib/tomcat7
+	export CATALINA_CONF=/etc/tomcat7
+	export ALF_USER=tomcat7
+	declare -a REMOTEFILES=($SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP)
+else
+	export ALF_HOME=/opt/alfresco
+	export CATALINA_HOME=$ALF_HOME/tomcat
+	export CATALINA_BASE=$ALF_HOME/tomcat
+	export CATALINE_CONF=$ALF_HOME/tomcat/conf
+	export ALF_USER=alfresco
+	declare -a REMOTEFILES=($TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP)
+fi
+
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo "Checking for the availability of the URLs inside script..."
@@ -98,8 +117,7 @@ echo
 
 URLERROR=0
 
-for REMOTE in $TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL \
-        $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP
+for REMOTE in ${REMOTEFILES[@]}
 
 do
         wget --spider $REMOTE  >& /dev/null
@@ -132,24 +150,27 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 $SUDO apt-get $APTVERBOSITY install curl;
 fi
 
-echo
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echo "You need to add a system user that runs the tomcat Alfresco instance."
-echo "Also updates locale support."
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Add alfresco system user${ques} [y/n] " -i "n" addalfresco
-if [ "$addalfresco" = "y" ]; then
-  $SUDO adduser --system --no-create-home --disabled-login --disabled-password --group $ALF_USER
-  echo
-  echo "Adding locale support"
-  #install locale to support that locale date formats in open office transformations
-  $SUDO locale-gen $LOCALESUPPORT
-  echo
-  echogreen "Finished adding alfresco user"
-  echo
-else
-  echo "Skipping adding alfresco user"
-  echo
+# Only necessary when Tomcat is installed from source. User Tomcat7 is created with package installer
+if [ "$usepack" = "n" ]; then
+	echo
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo "You need to add a system user that runs the tomcat Alfresco instance."
+	echo "Also updates locale support."
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	read -e -p "Add alfresco system user${ques} [y/n] " -i "n" addalfresco
+	if [ "$addalfresco" = "y" ]; then
+	  $SUDO adduser --system --no-create-home --disabled-login --disabled-password --group $ALF_USER
+	  echo
+	  echo "Adding locale support"
+	  #install locale to support that locale date formats in open office transformations
+	  $SUDO locale-gen $LOCALESUPPORT
+	  echo
+	  echogreen "Finished adding alfresco user"
+	  echo
+	else
+	  echo "Skipping adding alfresco user"
+	  echo
+	fi
 fi
 
 echo
@@ -181,26 +202,34 @@ read -e -p "Install Tomcat${ques} [y/n] " -i "n" installtomcat
 
 if [ "$installtomcat" = "y" ]; then
   echogreen "Installing Tomcat"
-  echo "Downloading tomcat..."
-  curl -# -L -O $TOMCAT_DOWNLOAD
-  # Make sure install dir exists
-  $SUDO mkdir -p $ALF_HOME
-  echo "Extracting..."
-  tar xf "$(find . -type f -name "apache-tomcat*")"
-  $SUDO mv "$(find . -type d -name "apache-tomcat*")" $CATALINA_HOME
-  # Remove apps not needed
-  $SUDO rm -rf $CATALINA_HOME/webapps/*
+  if [ "$usepack" = "y" ]; then
+		echo "Installing tomcat from package..."
+		$SUDO apt-get $APTVERBOSITY install tomcat7
+  else
+	  echo "Downloading tomcat..."
+	  curl -# -L -O $TOMCAT_DOWNLOAD
+	  # Make sure install dir exists
+	  $SUDO mkdir -p $ALF_HOME
+	  echo "Extracting..."
+	  tar xf "$(find . -type f -name "apache-tomcat*")"
+	  $SUDO mv "$(find . -type d -name "apache-tomcat*")" $CATALINA_HOME
+  fi
+  
+  # Remove apps not needed -- Why, keep default files to check if tomcat is working.
+  # $SUDO rm -rf $CATALINA_BASE/webapps/*
+  
   # Get Alfresco config
   echo "Downloading tomcat configuration files..."
-  $SUDO curl -# -o $CATALINA_HOME/conf/server.xml $BASE_DOWNLOAD/tomcat/server.xml
-  $SUDO curl -# -o $CATALINA_HOME/conf/catalina.properties $BASE_DOWNLOAD/tomcat/catalina.properties
+  $SUDO curl -# -o $CATALINA_CONF/server.xml $BASE_DOWNLOAD/tomcat/server.xml
+  $SUDO curl -# -o $CATALINA_CONF/catalina.properties $BASE_DOWNLOAD/tomcat/catalina.properties
   $SUDO curl -# -o /etc/init/alfresco.conf $BASE_DOWNLOAD/tomcat/alfresco.conf
   $SUDO sed -i "s/@@LOCALESUPPORT@@/$LOCALESUPPORT/g" /etc/init/alfresco.conf
   # Create /shared
-  $SUDO mkdir -p $CATALINA_HOME/shared/classes/alfresco/extension
-  $SUDO mkdir -p $CATALINA_HOME/shared/classes/alfresco/web-extension
+  $SUDO mkdir -p $CATALINA_BASE/shared/classes/alfresco/extension
+  $SUDO mkdir -p $CATALINA_BASE/shared/classes/alfresco/web-extension
   # Add endorsed dir
-  $SUDO mkdir -p $CATALINA_HOME/endorsed
+  $SUDO mkdir -p $CATALINA_BASE/endorsed
+  
   echo
   echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
   echo "You need to add the dns name, port and protocol for your server(s)."
@@ -209,9 +238,10 @@ if [ "$installtomcat" = "y" ]; then
   echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
   read -e -p "Please enter the public host name for Share server (fully qualified domain name)${ques} [`hostname`] " -i "`hostname`" SHARE_HOSTNAME
   read -e -p "Please enter the protocol to use for public Share server (http or https)${ques} [http] " -i "http" SHARE_PROTOCOL
-  SHARE_PORT=80
+  # Keep Share on default port and use a reverse proxy to do the trick.
+  SHARE_PORT=8080
   if [ "${SHARE_PROTOCOL,,}" = "https" ]; then
-    SHARE_PORT=443
+    SHARE_PORT=8443
   fi
   read -e -p "Please enter the host name for Alfresco Repository server (fully qualified domain name)${ques} [$SHARE_HOSTNAME] " -i "$SHARE_HOSTNAME" REPO_HOSTNAME
 
@@ -222,7 +252,7 @@ if [ "$installtomcat" = "y" ]; then
   sed -i "s/@@ALFRESCO_SHARE_SERVER_PORT@@/$SHARE_PORT/g" $ALFRESCO_GLOBAL_PROPERTIES
   sed -i "s/@@ALFRESCO_SHARE_SERVER_PROTOCOL@@/$SHARE_PROTOCOL/g" $ALFRESCO_GLOBAL_PROPERTIES
   sed -i "s/@@ALFRESCO_REPO_SERVER@@/$REPO_HOSTNAME/g" $ALFRESCO_GLOBAL_PROPERTIES
-  $SUDO mv $ALFRESCO_GLOBAL_PROPERTIES $CATALINA_HOME/shared/classes/
+  $SUDO mv $ALFRESCO_GLOBAL_PROPERTIES $CATALINA_BASE/shared/classes/
 
   read -e -p "Install Share config file (recommended)${ques} [y/n] " -i "n" installshareconfig
   if [ "$installshareconfig" = "y" ]; then
@@ -230,23 +260,31 @@ if [ "$installtomcat" = "y" ]; then
     $SUDO curl -# -o $SHARE_CONFIG_CUSTOM $BASE_DOWNLOAD/tomcat/share-config-custom.xml
     sed -i "s/@@ALFRESCO_SHARE_SERVER@@/$SHARE_HOSTNAME/g" $SHARE_CONFIG_CUSTOM
     sed -i "s/@@ALFRESCO_REPO_SERVER@@/$REPO_HOSTNAME/g" $SHARE_CONFIG_CUSTOM
-    $SUDO mv $SHARE_CONFIG_CUSTOM $CATALINA_HOME/shared/classes/alfresco/web-extension/
+    $SUDO mv $SHARE_CONFIG_CUSTOM $CATALINA_BASE/shared/classes/alfresco/web-extension/
   fi
 
   echo
   read -e -p "Install Postgres JDBC Connector${ques} [y/n] " -i "n" installpg
   if [ "$installpg" = "y" ]; then
-	curl -# -O $JDBCPOSTGRESURL/$JDBCPOSTGRES
-	$SUDO mv $JDBCPOSTGRES $CATALINA_HOME/lib
+	if [ "$usepack" = "y" ]; then
+		$SUDO apt-get $APTVERBOSITY install libpostgresql-jdbc-java
+	else
+		curl -# -O $JDBCPOSTGRESURL/$JDBCPOSTGRES
+		$SUDO mv $JDBCPOSTGRES $CATALINA_HOME/lib
+	fi
   fi
   echo
   read -e -p "Install Mysql JDBC Connector${ques} [y/n] " -i "n" installmy
   if [ "$installmy" = "y" ]; then
-    cd /tmp/alfrescoinstall
-	curl -# -L -O $JDBCMYSQLURL/$JDBCMYSQL
-	tar xf $JDBCMYSQL
-	cd "$(find . -type d -name "mysql-connector*")"
-	$SUDO mv mysql-connector*.jar $CATALINA_HOME/lib
+	if [ "$usepack" = "y" ]; then
+	    $SUDO apt-get $APTVERBOSITY install libmysql-java
+	else
+		cd /tmp/alfrescoinstall
+		curl -# -L -O $JDBCMYSQLURL/$JDBCMYSQL
+		tar xf $JDBCMYSQL
+		cd "$(find . -type d -name "mysql-connector*")"
+		$SUDO mv mysql-connector*.jar $CATALINA_HOME/lib
+	fi
   fi
   $SUDO chown -R $ALF_USER:$ALF_USER $CATALINA_HOME
   echo
@@ -331,19 +369,22 @@ echo "this install."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 read -e -p "Install LibreOffice${ques} [y/n] " -i "n" installibreoffice
 if [ "$installibreoffice" = "y" ]; then
-
-  cd /tmp/alfrescoinstall
-  curl -# -L -O $LIBREOFFICE
-  tar xf LibreOffice*.tar.gz
-  cd "$(find . -type d -name "LibreOffice*")"
-  cd DEBS
-  $SUDO dpkg -i *.deb
-  echo
-  echoblue "Installing some support fonts for better transformations."
-  $SUDO apt-get $APTVERBOSITY install ttf-mscorefonts-installer fonts-droid
-  echo
-  echogreen "Finished installing LibreOffice"
-  echo
+	if [ "$usepack" = "y" ]; then
+		$SUDO apt-get $APTVERBOSITY install libreoffice
+	else
+		cd /tmp/alfrescoinstall
+		curl -# -L -O $LIBREOFFICE
+		tar xf LibreOffice*.tar.gz
+		cd "$(find . -type d -name "LibreOffice*")"
+		cd DEBS
+		$SUDO dpkg -i *.deb
+	fi
+	echo
+	echoblue "Installing some support fonts for better transformations."
+	$SUDO apt-get $APTVERBOSITY install ttf-mscorefonts-installer fonts-droid
+	echo
+	echogreen "Finished installing LibreOffice"
+	echo
 else
   echo
   echo "Skipping install of LibreOffice"
@@ -536,10 +577,10 @@ read -e -p "Install Solr indexing engine${ques} [y/n] " -i "n" installsolr
 if [ "$installsolr" = "y" ]; then
 
   $SUDO mkdir -p $ALF_HOME/solr
-  $SUDO mkdir -p $CATALINA_HOME/conf/Catalina/localhost
+  $SUDO mkdir -p $CATALINA_CONF/Catalina/localhost
   $SUDO curl -# -o $ALF_HOME/solr/solr.zip $SOLR
   $SUDO curl -# -o $ALF_HOME/solr/apache-solr-1.4.1.war $SOLRWAR
-  $SUDO curl -# -o $CATALINA_HOME/conf/tomcat-users.xml $BASE_DOWNLOAD/tomcat/tomcat-users.xml
+  $SUDO curl -# -o $CATALINA_CONF/tomcat-users.xml $BASE_DOWNLOAD/tomcat/tomcat-users.xml
   cd $ALF_HOME/solr/
 
   $SUDO unzip -q solr.zip
@@ -560,7 +601,7 @@ if [ "$installsolr" = "y" ]; then
   echo "<Context docBase=\"$ALF_HOME/solr/apache-solr-1.4.1.war\" debug=\"0\" crossContext=\"true\">" >> /tmp/alfrescoinstall/solr.xml
   echo "  <Environment name=\"solr/home\" type=\"java.lang.String\" value=\"$ALF_HOME/solr\" override=\"true\"/>" >> /tmp/alfrescoinstall/solr.xml
   echo "</Context>" >> /tmp/alfrescoinstall/solr.xml
-  $SUDO mv /tmp/alfrescoinstall/solr.xml $CATALINA_HOME/conf/Catalina/localhost/solr.xml
+  $SUDO mv /tmp/alfrescoinstall/solr.xml $CATALINA_CONF/Catalina/localhost/solr.xml
 
   # Remove some unused stuff
   $SUDO rm $ALF_HOME/solr/solr.zip
@@ -593,7 +634,7 @@ echo "   Alfresco runs best with lots of memory. Add some more to \"lots\" and y
 echo "   Match the locale LC_ALL (or remove) setting to the one used in this script."
 echo "   Locale setting is needed for LibreOffice date handling support."
 echo "3. Update database and other settings in alfresco-global.properties"
-echo "   You will find this file in $CATALINA_HOME/shared/classes"
+echo "   You will find this file in $CATALINA_BASE/shared/classes"
 echo "4. Update cpu settings in $ALF_HOME/scripts/limitconvert.sh if you have more than 2 cores."
 echo "5. Start nginx if you have installed it: /etc/init.d/nginx start"
 echo "6. Start Alfresco/tomcat: $SUDO service alfresco start"

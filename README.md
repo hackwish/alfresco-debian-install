@@ -1,6 +1,17 @@
 Alfresco Ubuntu install
 =======================
 
+Update by Yannick MOLINET
+-------------------------
+
+- Adapt for Debian
+- Allow to install tomcat7 from package
+- Allow not use sudo
+- Add more vars for installation process (CATALINA_CONF, CATALINA_BASE)
+- Avoid to execute remote scrit by SSH
+- Add script to install JASIG CAS with Apache mod_auth and mod_jk on a remote computer
+
+
 Alfresco script based install for Ubuntu servers.
 ----------------------------
 
