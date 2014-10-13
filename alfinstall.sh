@@ -6,7 +6,7 @@
 # Distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License (CC BY-SA 3.0)
 # -------
 
-export BASE_DOWNLOAD=https://raw.githubusercontent.com/loftuxab/alfresco-ubuntu-install/master
+export BASE_DOWNLOAD=https://raw.githubusercontent.com/ymolinet/alfresco-ubuntu-install/master
 export KEYSTOREBASE=http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/keystore
 
 #Change this to prefered locale to make sure it exists. This has impact on LibreOffice transformations
@@ -83,7 +83,7 @@ if [ "$usepack" = "y" ]; then
 	fi
 	export $SUDO=`sudo`
 else
-	export $SUDO=
+	export $SUDO=''
 fi
 
 export APTVERBOSITY="-qq -y"
@@ -135,6 +135,25 @@ then
     echored "Please fix the above errors and rerun."
     echo
     exit
+fi
+
+$OS=`uname -a`
+if [[ $string == *Debian* ]]
+then
+	echo
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo "Preparing for install on Debian. Check/Add contrib sources if not present in sources.list"
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+
+	debcontrib="deb http://ftp.fr.debian.org/debian wheezy main contrib"
+	deb="deb http://ftp.fr.debian.org/debian wheezy main"
+	debsec="deb http://security.debian.org/ wheezy/updates main"
+	debcontribsec="deb http://security.debian.org/ wheezy/updates main contrib"
+
+	sed -i.bak -e "s/$deb/$debcontrib/g" /etc/apt/sources.list
+	sed -i.bak -e "s/$debsec/$debcontribsec/g" /etc/apt/sources.list
+
+	echo
 fi
 
 echo
@@ -224,7 +243,9 @@ if [ "$installtomcat" = "y" ]; then
   $SUDO curl -# -o $CATALINA_CONF/server.xml $BASE_DOWNLOAD/tomcat/server.xml
   $SUDO curl -# -o $CATALINA_CONF/catalina.properties $BASE_DOWNLOAD/tomcat/catalina.properties
   $SUDO curl -# -o /etc/init/alfresco.conf $BASE_DOWNLOAD/tomcat/alfresco.conf
+  
   $SUDO sed -i "s/@@LOCALESUPPORT@@/$LOCALESUPPORT/g" /etc/init/alfresco.conf
+  
   # Create /shared
   $SUDO mkdir -p $CATALINA_BASE/shared/classes/alfresco/extension
   $SUDO mkdir -p $CATALINA_BASE/shared/classes/alfresco/web-extension
@@ -344,13 +365,15 @@ fi
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo "Install Java JDK."
-echo "This will install the OpenJDK version of Java. If you prefer Oracle Java"
+echo "This will install the OpenJDK 7 version of Java. If you prefer Oracle Java"
 echo "you need to download and install that manually."
+echo "If OpenJDK6 is installed, it will be removed".
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 read -e -p "Install OpenJDK7${ques} [y/n] " -i "n" installjdk
 if [ "$installjdk" = "y" ]; then
   echoblue "Installing OpenJDK7. Fetching packages..."
   $SUDO apt-get $APTVERBOSITY install openjdk-7-jdk
+  $SUDO apt-get $APTVERBOSITY autoremove openjdk-6-jre-headless openjdk-6-jre-lib openjdk-6-jre
   echo
   echogreen "Finished installing OpenJDK"
   echo
@@ -654,15 +677,19 @@ if [ "$installpg" = y ]; then
 			localpath="$ALF_HOME/scripts"
 			fullpath="$localpath/postgresql.sh"
 			
-			sed -i.bak -e "s/set remoteip=.*/set remoteip=$psqlserver/g" $ALF_HOME/scripts/remote-script.sh
-			sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$psqlroot/g" $ALF_HOME/scripts/remote-script.sh
-			sed -i.bak -e "s/set localpath=.*/set localpath=$localpath/g" $ALF_HOME/scripts/remote-script.sh
-			sed -i.bak -e "s/set filename=.*/set filename=postgresql.sh/g" $ALF_HOME/scripts/remote-script.sh
-			sed -i.bak -e "s/set fullpath=.*/set remoteip=$fullpath/g" $ALF_HOME/scripts/remote-script.sh
+			if [ -f $ALF_HOME/scripts/remote-script.sh ]; then
+				sed -i.bak -e "s/set remoteip=.*/set remoteip=$psqlserver/g" $ALF_HOME/scripts/remote-script.sh
+				sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$psqlroot/g" $ALF_HOME/scripts/remote-script.sh
+				sed -i.bak -e "s/set localpath=.*/set localpath=$localpath/g" $ALF_HOME/scripts/remote-script.sh
+				sed -i.bak -e "s/set filename=.*/set filename=postgresql.sh/g" $ALF_HOME/scripts/remote-script.sh
+				sed -i.bak -e "s/set fullpath=.*/set remoteip=$fullpath/g" $ALF_HOME/scripts/remote-script.sh
 
-			# send file and execute to remote server
-			$ALF_HOME/scripts/remote-script.sh
-			
+				# send file and execute to remote server
+				$ALF_HOME/scripts/remote-script.sh
+			else
+				echored "remote-script.sh is missing !"
+				echored "You must install Postgresql manually"
+			fi
 		else
 			echored "postgresql installation script not found."
 			echored "You must install it manually".
