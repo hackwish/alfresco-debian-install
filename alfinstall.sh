@@ -51,6 +51,7 @@ echored () {
 echogreen () {
   echo "${bldgre}$1${txtrst}"
 }
+
 cd /tmp
 if [ -d "alfrescoinstall" ]; then
 	rm -rf alfrescoinstall
