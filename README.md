@@ -4,6 +4,8 @@ Alfresco Ubuntu install
 Update by Yannick MOLINET
 -------------------------
 
+!!!!!!!!!! NOT READY FOR USE !!!!!!!!!!!!!!!
+
 - Adapt for Debian
 - Allow to install tomcat7 from package
 - Allow not use sudo
@@ -24,7 +26,7 @@ Installing
 ----
 To start the install, in Ubuntu terminal run  
  
-`curl -O https://raw.githubusercontent.com/loftuxab/alfresco-ubuntu-install/master/alfinstall.sh`  
+`curl -O https://raw.githubusercontent.com/ymolinet/alfresco-ubuntu-install/master/alfinstall.sh`  
 `chmod u+x alfinstall.sh`  
 `./alfinstall.sh` 
 
