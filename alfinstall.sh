@@ -89,9 +89,9 @@ if [ "$usepack" = "y" ]; then
 		echo "sudo detected ..."
 		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	fi
-	export SUDO=`sudo`
+	SUDO=`sudo`
 else
-	export SUDO=''
+	SUDO=''
 fi
 
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -158,7 +158,7 @@ then
     exit
 fi
 
-export $OS="`uname -a`"
+OS=`uname -a`
 if [[ $OS == *Debian* ]]
 then
 	echo
@@ -175,6 +175,10 @@ then
 	sed -i.bak -e "s/$debsec/$debcontribsec/g" /etc/apt/sources.list
 
 	echo
+else
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo "Non debian OS (Ubuntu ?)"
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 fi
 
 echo
