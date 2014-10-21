@@ -142,6 +142,7 @@ URLERROR=0
 for REMOTE in ${REMOTEFILES[@]}
 
 do
+		echo "check remote file: $REMOTE"
         wget --spider $REMOTE  >& /dev/null
         if [ $? != 0 ]
         then
