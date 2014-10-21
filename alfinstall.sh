@@ -95,17 +95,17 @@ else
 fi
 
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echo "Except is required to execute remote ssh command."
+echo "expect is required to execute remote ssh command."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 
-if [ "`which except`" = "" ]; then
+if [ "`which expect`" = "" ]; then
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo "You need to install except."
+	echo "You need to install expect."
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	apt-get $APTVERBOSITY install except
+	apt-get $APTVERBOSITY install expect
 else
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo "except detected ..."
+	echo "expect detected ..."
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 fi
 
