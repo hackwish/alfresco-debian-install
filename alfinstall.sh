@@ -158,7 +158,7 @@ then
     exit
 fi
 
-export $OS=`uname -a`
+export $OS="`uname -a`"
 if [[ $OS == *Debian* ]]
 then
 	echo
