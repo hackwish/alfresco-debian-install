@@ -221,12 +221,12 @@ fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echo "Ubuntu default for number of allowed open files in the file system is too low"
+echo "Ubuntu/Debian default for number of allowed open files in the file system is too low"
 echo "for alfresco use and tomcat may because of this stop with the error"
 echo "\"too many open files\". You should update this value if you have not done so."
 echo "Read more at http://wiki.alfresco.com/wiki/Too_many_open_files"
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Add limits.conf${ques} [y/n] " -i "n" updatelimits
+read -e -p "Add limits.conf${ques} [y/n] " -i "y" updatelimits
 if [ "$updatelimits" = "y" ]; then
   echo "alfresco  soft  nofile  8192" | $SUDO tee -a /etc/security/limits.conf
   echo "alfresco  hard  nofile  65536" | $SUDO tee -a /etc/security/limits.conf
@@ -302,7 +302,7 @@ if [ "$installtomcat" = "y" ]; then
   sed -i "s/@@ALFRESCO_REPO_SERVER@@/$REPO_HOSTNAME/g" $ALFRESCO_GLOBAL_PROPERTIES
   $SUDO mv $ALFRESCO_GLOBAL_PROPERTIES $CATALINA_BASE/shared/classes/
 
-  read -e -p "Install Share config file (recommended)${ques} [y/n] " -i "n" installshareconfig
+  read -e -p "Install Share config file (recommended)${ques} [y/n] " -i "y" installshareconfig
   if [ "$installshareconfig" = "y" ]; then
     SHARE_CONFIG_CUSTOM=/tmp/alfrescoinstall/share-config-custom.xml
     $SUDO curl -# -o $SHARE_CONFIG_CUSTOM $BASE_DOWNLOAD/tomcat/share-config-custom.xml
@@ -312,7 +312,7 @@ if [ "$installtomcat" = "y" ]; then
   fi
 
   echo
-  read -e -p "Install Postgres JDBC Connector${ques} [y/n] " -i "n" installpg
+  read -e -p "Install Postgres JDBC Connector${ques} [y/n] " -i "y" installpg
   if [ "$installpg" = "y" ]; then
 	if [ "$usepack" = "y" ]; then
 		$SUDO apt-get $APTVERBOSITY install libpostgresql-jdbc-java
@@ -320,21 +320,22 @@ if [ "$installtomcat" = "y" ]; then
 		curl -# -O $JDBCPOSTGRESURL/$JDBCPOSTGRES
 		$SUDO mv $JDBCPOSTGRES $CATALINA_HOME/lib
 	fi
-  fi
-  echo
-  read -e -p "Install Mysql JDBC Connector${ques} [y/n] " -i "n" installmy
-  if [ "$installmy" = "y" ]; then
-	if [ "$usepack" = "y" ]; then
-	    $SUDO apt-get $APTVERBOSITY install libmysql-java
-	else
-		cd /tmp/alfrescoinstall
-		curl -# -L -O $JDBCMYSQLURL/$JDBCMYSQL
-		tar xf $JDBCMYSQL
-		cd "$(find . -type d -name "mysql-connector*")"
-		$SUDO mv mysql-connector*.jar $CATALINA_HOME/lib
+  else
+	echo
+	read -e -p "Install Mysql JDBC Connector${ques} [y/n] " -i "n" installmy
+	if [ "$installmy" = "y" ]; then
+		if [ "$usepack" = "y" ]; then
+			$SUDO apt-get $APTVERBOSITY install libmysql-java
+		else
+			cd /tmp/alfrescoinstall
+			curl -# -L -O $JDBCMYSQLURL/$JDBCMYSQL
+			tar xf $JDBCMYSQL
+			cd "$(find . -type d -name "mysql-connector*")"
+			$SUDO mv mysql-connector*.jar $CATALINA_HOME/lib
+		fi
 	fi
+	$SUDO chown -R $ALF_USER:$ALF_USER $CATALINA_HOME
   fi
-  $SUDO chown -R $ALF_USER:$ALF_USER $CATALINA_HOME
   echo
   echogreen "Finished installing Tomcat"
   echo
@@ -395,7 +396,7 @@ echo "This will install the OpenJDK 7 version of Java. If you prefer Oracle Java
 echo "you need to download and install that manually."
 echo "If OpenJDK6 is installed, it will be removed".
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install OpenJDK7${ques} [y/n] " -i "n" installjdk
+read -e -p "Install OpenJDK7${ques} [y/n] " -i "y" installjdk
 if [ "$installjdk" = "y" ]; then
   echoblue "Installing OpenJDK7. Fetching packages..."
   $SUDO apt-get $APTVERBOSITY install openjdk-7-jdk
@@ -417,7 +418,7 @@ echo "Newer version of Libreoffice has better document filters, and produce bett
 echo "transformations. If you prefer to use Ubuntu standard packages you can skip"
 echo "this install."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install LibreOffice${ques} [y/n] " -i "n" installibreoffice
+read -e -p "Install LibreOffice${ques} [y/n] " -i "y" installibreoffice
 if [ "$installibreoffice" = "y" ]; then
 	if [ "$usepack" = "y" ]; then
 		$SUDO apt-get $APTVERBOSITY install libreoffice
@@ -450,7 +451,7 @@ echo "This will ImageMagick from Ubuntu packages."
 echo "It is recommended that you install ImageMagick."
 echo "If you prefer some other way of installing ImageMagick, skip this step."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install ImageMagick${ques} [y/n] " -i "n" installimagemagick
+read -e -p "Install ImageMagick${ques} [y/n] " -i "y" installimagemagick
 if [ "$installimagemagick" = "y" ]; then
 
   echoblue "Installing ImageMagick. Fetching packages..."
@@ -476,7 +477,7 @@ echo "This will download and install swftools used for transformations to Flash.
 echo "Since the swftools Ubuntu package is not included in all versions of Ubuntu,"
 echo "this install downloads from swftools.org and compiles."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install Swftools${ques} [y/n] " -i "n" installswftools
+read -e -p "Install Swftools${ques} [y/n] " -i "y" installswftools
 
 if [ "$installswftools" = "y" ]; then
   echoblue "Installing build tools and libraries needed to compile swftools. Fetching packages..."
@@ -578,7 +579,7 @@ echo "If you have downloaded your war files you can skip this step add them manu
 echo "This install place downloaded files in the $ALF_HOME/addons and then use the"
 echo "apply.sh script to add them to tomcat/webapps. Se this script for more info."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Add Alfresco war files${ques} [y/n] " -i "n" installwar
+read -e -p "Add Alfresco war files${ques} [y/n] " -i "y" installwar
 if [ "$installwar" = "y" ]; then
 
   # Make extract dir
@@ -628,7 +629,7 @@ echo "Solr runs as a separate application and is slightly more complex to config
 echo "As Solr is more advanced and handle multilingual better it is recommended that"
 echo "you install Solr."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install Solr indexing engine${ques} [y/n] " -i "n" installsolr
+read -e -p "Install Solr indexing engine${ques} [y/n] " -i "y" installsolr
 if [ "$installsolr" = "y" ]; then
 
   $SUDO mkdir -p $ALF_HOME/solr
@@ -678,7 +679,7 @@ if [ -d "$ALF_HOME/www" ]; then
    $SUDO chown -R www-data:root $ALF_HOME/www
 fi
 
-if [ "$installpg" = y ]; then
+if [ "$installpg" = "y" ]; then
 	echo
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo "Install PostgreSQL Engine."
@@ -703,18 +704,24 @@ if [ "$installpg" = y ]; then
 			localpath="$ALF_HOME/scripts"
 			fullpath="$localpath/postgresql.sh"
 			
-			if [ -f $ALF_HOME/scripts/remote-script.sh ]; then
-				sed -i.bak -e "s/set remoteip=.*/set remoteip=$psqlserver/g" $ALF_HOME/scripts/remote-script.sh
-				sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$psqlroot/g" $ALF_HOME/scripts/remote-script.sh
-				sed -i.bak -e "s/set localpath=.*/set localpath=$localpath/g" $ALF_HOME/scripts/remote-script.sh
-				sed -i.bak -e "s/set filename=.*/set filename=postgresql.sh/g" $ALF_HOME/scripts/remote-script.sh
-				sed -i.bak -e "s/set fullpath=.*/set remoteip=$fullpath/g" $ALF_HOME/scripts/remote-script.sh
+			if [ "$psqlserver" != "127.0.0.1" ]; then
+				if [ -f $ALF_HOME/scripts/remote-script.sh ]; then
+					sed -i.bak -e "s/set remoteip=.*/set remoteip=$psqlserver/g" $ALF_HOME/scripts/remote-script.sh
+					sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$psqlroot/g" $ALF_HOME/scripts/remote-script.sh
+					sed -i.bak -e "s/set localpath=.*/set localpath=$localpath/g" $ALF_HOME/scripts/remote-script.sh
+					sed -i.bak -e "s/set filename=.*/set filename=postgresql.sh/g" $ALF_HOME/scripts/remote-script.sh
+					sed -i.bak -e "s/set fullpath=.*/set remoteip=$fullpath/g" $ALF_HOME/scripts/remote-script.sh
 
-				# send file and execute to remote server
-				$ALF_HOME/scripts/remote-script.sh
+					# send file and execute to remote server
+					echoblue "Install postgresql remotly"
+					$ALF_HOME/scripts/remote-script.sh
+				else
+					echored "remote-script.sh is missing !"
+					echored "You must install Postgresql manually"
+				fi
 			else
-				echored "remote-script.sh is missing !"
-				echored "You must install Postgresql manually"
+				echoblue "Install postgresl locally ..."
+				$ALF_HOME/scripts/postgresql.sh
 			fi
 		else
 			echored "postgresql installation script not found."
