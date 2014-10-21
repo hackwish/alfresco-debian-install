@@ -89,9 +89,9 @@ if [ "$usepack" = "y" ]; then
 		echo "sudo detected ..."
 		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	fi
-	export $SUDO=`sudo`
+	export SUDO=`sudo`
 else
-	export $SUDO
+	export SUDO=''
 fi
 
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
