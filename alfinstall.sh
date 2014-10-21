@@ -91,7 +91,7 @@ if [ "$usepack" = "y" ]; then
 	fi
 	export $SUDO=`sudo`
 else
-	export $SUDO=''
+	export $SUDO
 fi
 
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
