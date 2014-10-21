@@ -166,13 +166,13 @@ then
 	echo "Preparing for install on Debian. Check/Add contrib sources if not present in sources.list"
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 
-	debcontrib="deb http://ftp.fr.debian.org/debian wheezy main contrib"
-	deb="deb http://ftp.fr.debian.org/debian wheezy main"
-	debsec="deb http://security.debian.org/ wheezy/updates main"
-	debcontribsec="deb http://security.debian.org/ wheezy/updates main contrib"
+	debcontrib="deb http:\/\/ftp.fr.debian.org\/debian wheezy main contrib"
+	deb="deb http:\/\/ftp.fr.debian.org\/debian wheezy main"
+	debsec="deb http:\/\/security.debian.org\/ wheezy\/updates main"
+	debcontribsec="deb http:\/\/security.debian.org\/ wheezy\/updates main contrib"
 
-	sed -i.bak -e "s/$deb/$debcontrib/g" /etc/apt/sources.list
-	sed -i.bak -e "s/$debsec/$debcontribsec/g" /etc/apt/sources.list
+	sed -i.bak -e 's/'"$deb"'/'"$debcontrib"'/g' /etc/apt/sources.list
+	sed -i.bak -e 's/'"$debsec"'/'"$debcontribsec"'/g' /etc/apt/sources.list
 
 	echo
 else
