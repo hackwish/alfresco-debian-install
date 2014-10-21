@@ -114,7 +114,7 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 echo "Installing Method ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo
-read -e -p "Use maximum system package (all except swftools)${ques} [y/n] " -i "n" usepack
+read -e -p "Use maximum system package (all except swftools)${ques} [y/n] " -i "y" usepack
 if [ "$usepack" = "y" ]; then
 	export ALF_HOME=/opt/alfresco
 	export CATALINA_HOME=/usr/share/tomcat7
@@ -158,8 +158,8 @@ then
     exit
 fi
 
-$OS=`uname -a`
-if [[ $string == *Debian* ]]
+export $OS=`uname -a`
+if [[ $OS == *Debian* ]]
 then
 	echo
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
