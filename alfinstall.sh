@@ -514,12 +514,12 @@ echo
     $SUDO curl -# -o $ALF_HOME/addons/apply.sh $BASE_DOWNLOAD/scripts/apply.sh
     $SUDO chmod u+x $ALF_HOME/addons/apply.sh
 
-	sed -i.bak -e "s;ALF_HOME=*$;ALF_HOME=${ALF_HOME};g" $ALF_HOME/addons/apply.sh
-	sed -i.bak -e "s;CATALINA_HOME=*$;CATALINA_HOME=${CATALINA_HOME};g"  $ALF_HOME/addons/apply.sh
-	sed -i.bak -e "s;CATALINA_BASE=*$;CATALINA_BASE=${CATALINA_BASE};g"  $ALF_HOME/addons/apply.sh
-	sed -i.bak -e "s;CATALINA_CONF=*$;CATALINA_CONF=${CATALINA_CONF};g"  $ALF_HOME/addons/apply.sh	
-	sed -i.bak -e "s;CATALINA_PID=*$;CATALINA_PID=${CATALINA_PID};g"  $ALF_HOME/addons/apply.sh
-	sed -i.bak -e "s;ALF_USER=*$;ALF_USER=${ALF_USER};g"  $ALF_HOME/addons/apply.sh
+	sed -i.bak -e "s;export ALF_HOME=*$;export ALF_HOME=${ALF_HOME};g" $ALF_HOME/addons/apply.sh
+	sed -i.bak -e "s;export CATALINA_HOME=*$;export CATALINA_HOME=${CATALINA_HOME};g"  $ALF_HOME/addons/apply.sh
+	sed -i.bak -e "s;export CATALINA_BASE=*$;export CATALINA_BASE=${CATALINA_BASE};g"  $ALF_HOME/addons/apply.sh
+	sed -i.bak -e "s;export CATALINA_CONF=*$;export CATALINA_CONF=${CATALINA_CONF};g"  $ALF_HOME/addons/apply.sh	
+	sed -i.bak -e "s;export CATALINA_PID=*$;export CATALINA_PID=${CATALINA_PID};g"  $ALF_HOME/addons/apply.sh
+	sed -i.bak -e "s;export ALF_USER=*$;export ALF_USER=${ALF_USER};g"  $ALF_HOME/addons/apply.sh
 	
 	fi
   if [ ! -f "$ALF_HOME/addons/alfresco-mmt.jar" ]; then
