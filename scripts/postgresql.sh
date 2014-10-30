@@ -58,6 +58,7 @@ echoblue "--------------------------------------------"
 echoblue
 
 if [ "$installpg" = "y" ]; then
+  $SUDO apt-get $APTVERBOSITY update
   $SUDO apt-get $APTVERBOSITY install postgresql
   echo
 fi
