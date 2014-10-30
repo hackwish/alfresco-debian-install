@@ -31,7 +31,7 @@ echogreen () {
 
 if [ "`which sudo`" = "" ]; then
 	export SUDO=''
-	export SU_POSTGRES='su posgres -c \"'
+	export SU_POSTGRES='su postgres -c \"'
 	export END_SU='\"'
 else
 	export SUDO='sudo'

@@ -228,8 +228,13 @@ echo "Read more at http://wiki.alfresco.com/wiki/Too_many_open_files"
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 read -e -p "Add limits.conf${ques} [y/n] " -i "y" updatelimits
 if [ "$updatelimits" = "y" ]; then
-  echo "alfresco  soft  nofile  8192" | $SUDO tee -a /etc/security/limits.conf
-  echo "alfresco  hard  nofile  65536" | $SUDO tee -a /etc/security/limits.conf
+	if [ "$usepack" = "y" ]; then
+		echo "tomcat7  soft  nofile  8192" | $SUDO tee -a /etc/security/limits.conf
+		echo "tomcat7  hard  nofile  65536" | $SUDO tee -a /etc/security/limits.conf
+	else
+		echo "alfresco  soft  nofile  8192" | $SUDO tee -a /etc/security/limits.conf
+		echo "alfresco  hard  nofile  65536" | $SUDO tee -a /etc/security/limits.conf
+	fi
   echo
   echogreen "Updated limits.conf"
   echo
