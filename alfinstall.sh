@@ -745,6 +745,8 @@ if [ "$installpg" = "y" ]; then
 			sed -i.bak "s/db.password=.*/db.password=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.name=.*/db.name=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.url=.*/db.jdbc:postgresql://$psqlserver:5432/${db.name}/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			
+			service alfresco restart
 		fi
 	else 
 		echored "You have installed and/or configured your PSQL Server manually"
