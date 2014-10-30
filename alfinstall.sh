@@ -693,27 +693,27 @@ if [ "$installpg" = "y" ]; then
 		read -e -p "Network interface to accessing to psql server (eth0) ?" -i "eth0" psqliface
 		
 		localip=`ifconfig $psqliface | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
-		localmask=`ifconfig ^$psqliface | sed -rn '2s/ .*:(.*)$/\1/p'`
-		localnet="$localip/$localmask"
+		localmask=`ifconfig $psqliface | sed -rn '2s/ .*:(.*)$/\1/p'`
+		localnet="$localip\/$localmask"
 		
 		#Update postgresl script with correct vars
 		if [ -f $ALF_HOME/scripts/postgresql.sh ]; then
 			# Prepare PSQL script installer
 			sed -i.bak -e "s/export ALFRESCOSERVER=.*/export ALFRESCOSERVER=$localnet/g" $ALF_HOME/scripts/postgresql.sh
-			# Prepare SEND-SCRIPT
-			localpath="$ALF_HOME/scripts"
-			fullpath="$localpath/postgresql.sh"
-			
-			if [ "$psqlserver" != "127.0.0.1" ]; then
-				if [ -f $ALF_HOME/scripts/remote-script.sh ]; then
-					sed -i.bak -e "s/set remoteip=.*/set remoteip=$psqlserver/g" $ALF_HOME/scripts/remote-script.sh
-					sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$psqlroot/g" $ALF_HOME/scripts/remote-script.sh
-					sed -i.bak -e "s/set localpath=.*/set localpath=$localpath/g" $ALF_HOME/scripts/remote-script.sh
-					sed -i.bak -e "s/set filename=.*/set filename=postgresql.sh/g" $ALF_HOME/scripts/remote-script.sh
-					sed -i.bak -e "s/set fullpath=.*/set remoteip=$fullpath/g" $ALF_HOME/scripts/remote-script.sh
 
+			# Prepare SEND-SCRIPT
+			fullpath="$ALF_HOME/scripts/postgresql.sh"
+			
+			# Add \ before each / for sed
+			if [ "$psqlserver" != "127.0.0.1" ]; then
+				echoblue "Install postgresql remotly"
+				if [ -f $ALF_HOME/scripts/remote-script.sh ]; then
+					sed -i.bak -e "s/set remoteip.*/set remoteip $psqlserver/g" $ALF_HOME/scripts/remote-script.sh
+					sed -i.bak -e "s/set rootpassword.*/set rootpassword $psqlroot/g" $ALF_HOME/scripts/remote-script.sh
+					sed -i.bak -e "s/set filename.*/set filename postgresql.sh/g" $ALF_HOME/scripts/remote-script.sh
+					sed -i.bak -e "s;set fullpath.*$;set fullpath ${fullpath};g" $ALF_HOME/scripts/remote-script.sh
+					
 					# send file and execute to remote server
-					echoblue "Install postgresql remotly"
 					$ALF_HOME/scripts/remote-script.sh
 				else
 					echored "remote-script.sh is missing !"
@@ -730,7 +730,7 @@ if [ "$installpg" = "y" ]; then
 
 		
 		read -e -p "Do you want to update your alfresco-global.properties file ?[y/n]" -i "n" alfupdate
-		if ["$update"="y"]; then
+		if [ "$update" = "y" ]; then
 			sed -i.bak "s/db.driver=.*/db.driver=org.postgresql.Driver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.username=.*/db.username=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.password=.*/db.password=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties

@@ -11,7 +11,6 @@ if {$force_conservative} {
 set timeout -1
 set remoteip=
 set rootpassword=
-set localpath=
 set filename=
 set fullpath=
 
