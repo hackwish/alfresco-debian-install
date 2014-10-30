@@ -244,7 +244,7 @@ echo "Tomcat is the application server that runs Alfresco."
 echo "You will also get the option to install jdbc lib for Postgresql or MySql/MariaDB."
 echo "Install the jdbc lib for the database you intend to use."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install Tomcat${ques} [y/n] " -i "n" installtomcat
+read -e -p "Install Tomcat${ques} [y/n] " -i "y" installtomcat
 
 if [ "$installtomcat" = "y" ]; then
   echogreen "Installing Tomcat"
@@ -594,7 +594,7 @@ if [ "$installwar" = "y" ]; then
   $SUDO rm -rf /tmp/alfrescoinstall/war
 
   cd /tmp/alfrescoinstall
-  read -e -p "Add Google docs integration${ques} [y/n] " -i "n" installgoogledocs
+  read -e -p "Add Google docs integration${ques} [y/n] " -i "y" installgoogledocs
   if [ "$installgoogledocs" = "y" ]; then
   	echo "Downloading Google docs addon..."
     curl -# -O $GOOGLEDOCSREPO
@@ -603,7 +603,7 @@ if [ "$installwar" = "y" ]; then
     $SUDO mv alfresco-googledocs-share* $ALF_HOME/addons/share/
   fi
 
-  read -e -p "Add Sharepoint plugin${ques} [y/n] " -i "n" installspp
+  read -e -p "Add Sharepoint plugin${ques} [y/n] " -i "y" installspp
   if [ "$installspp" = "y" ]; then
     echo "Downloading Sharepoint addon..."
     curl -# -O $SPP
@@ -662,10 +662,10 @@ if [ "$installsolr" = "y" ]; then
   # Remove some unused stuff
   $SUDO rm $ALF_HOME/solr/solr.zip
 
+  sed -i.bak -e "s/index.subsystem.name=*/index.subsystem.name=solr/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+  
   echo
   echogreen "Finished installing Solr engine."
-  echored "You must manually update alfresco-global.properties."
-  echo "Set property value index.subsystem.name=solr"
   echo
 else
   echo
@@ -686,13 +686,13 @@ if [ "$installpg" = "y" ]; then
 	echo "You have choice to use PSQL Connector, do you want to install a PSQL Server ? "
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 
-	read -e -p "Do you want install PostgreSQL Server${ques} [y/n] " -i "n" installpsql
+	read -e -p "Do you want install PostgreSQL Server${ques} [y/n] " -i "y" installpsql
 	if [ "$installpsql" = "y" ]; then
 		read -e -p "Where (127.0.0.1 for local installation) ?" -i "127.0.0.1" psqlserver
-		read -e -p "Root password for $psqlserver/$psqlmask ?" psqlroot
+		read -e -p "Root password for $psqlserver ?" psqlroot
 		read -e -p "Network interface to accessing to psql server (eth0) ?" -i "eth0" psqliface
-		read -e -p "Create Alfresco User ? [y/n] " -i "n" createuser
-		read -e -p "Create Alfresco Database ? [y/n] " -i "n" createdb
+		read -e -p "Create Alfresco User ? [y/n] " -i "y" createuser
+		read -e -p "Create Alfresco Database ? [y/n] " -i "y" createdb
 		read -e -p "Set password for postgresql admin account ? [y/n]" -i "n"  setadminpwd
 
 		sed -i.bak -e "s/createdb=y/createdb=$createdb/g" $ALF_HOME/scripts/postgresql.sh
@@ -701,12 +701,12 @@ if [ "$installpg" = "y" ]; then
 
 		localip=`ifconfig $psqliface | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
 		localmask=`ifconfig $psqliface | sed -rn '2s/ .*:(.*)$/\1/p'`
-		localnet="$localip\/$localmask"
+		localnet="$localip/$localmask"
 		
 		#Update postgresl script with correct vars
 		if [ -f $ALF_HOME/scripts/postgresql.sh ]; then
 			# Prepare PSQL script installer
-			sed -i.bak -e "s/export ALFRESCOSERVER=.*/export ALFRESCOSERVER=$localnet/g" $ALF_HOME/scripts/postgresql.sh
+			sed -i.bak -e "s;export ALFRESCOSERVER=.*$;export ALFRESCOSERVER=${localnet};g" $ALF_HOME/scripts/postgresql.sh
 
 			# Prepare SEND-SCRIPT
 			fullpath="$ALF_HOME/scripts/postgresql.sh"
@@ -738,8 +738,8 @@ if [ "$installpg" = "y" ]; then
 		fi
 
 		
-		read -e -p "Do you want to update your alfresco-global.properties file ?[y/n]" -i "n" alfupdate
-		if [ "$update" = "y" ]; then
+		read -e -p "Do you want to update your alfresco-global.properties file ?[y/n]" -i "y" alfupdate
+		if [ "$alfupdate" = "y" ]; then
 			sed -i.bak "s/db.driver=.*/db.driver=org.postgresql.Driver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.username=.*/db.username=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.password=.*/db.password=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties

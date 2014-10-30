@@ -42,6 +42,7 @@ fi
 export ALFRESCODB=alfresco
 export ALFRESCOUSER=alfresco
 export ALFRESCOSERVER="127.0.0.1/32"
+export APTVERBOSITY="-qq -y"
 
 installpg=y
 createdb=y
@@ -57,7 +58,7 @@ echoblue "--------------------------------------------"
 echoblue
 
 if [ "$installpg" = "y" ]; then
-  $SUDO apt-get install postgresql
+  $SUDO apt-get $APTVERBOSITY install postgresql
   echo
 fi
 
