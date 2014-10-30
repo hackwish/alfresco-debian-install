@@ -120,13 +120,15 @@ if [ "$usepack" = "y" ]; then
 	export CATALINA_HOME=/usr/share/tomcat7
 	export CATALINA_BASE=/var/lib/tomcat7
 	export CATALINA_CONF=/etc/tomcat7
+	export CATALINA_PID=/var/run/tomcat7.pid
 	export ALF_USER=tomcat7
 	declare -a REMOTEFILES=($SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP)
 else
 	export ALF_HOME=/opt/alfresco
 	export CATALINA_HOME=$ALF_HOME/tomcat
 	export CATALINA_BASE=$ALF_HOME/tomcat
-	export CATALINE_CONF=$ALF_HOME/tomcat/conf
+	export CATALINA_CONF=$ALF_HOME/tomcat/conf
+	export CATALINA_PID=$ALF_HOME/tomcat.pid
 	export ALF_USER=alfresco
 	declare -a REMOTEFILES=($TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP)
 fi
@@ -228,13 +230,8 @@ echo "Read more at http://wiki.alfresco.com/wiki/Too_many_open_files"
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 read -e -p "Add limits.conf${ques} [y/n] " -i "y" updatelimits
 if [ "$updatelimits" = "y" ]; then
-	if [ "$usepack" = "y" ]; then
-		echo "tomcat7  soft  nofile  8192" | $SUDO tee -a /etc/security/limits.conf
-		echo "tomcat7  hard  nofile  65536" | $SUDO tee -a /etc/security/limits.conf
-	else
-		echo "alfresco  soft  nofile  8192" | $SUDO tee -a /etc/security/limits.conf
-		echo "alfresco  hard  nofile  65536" | $SUDO tee -a /etc/security/limits.conf
-	fi
+  echo "$ALF_USER  soft  nofile  8192" | $SUDO tee -a /etc/security/limits.conf
+  echo "$ALF_USER  hard  nofile  65536" | $SUDO tee -a /etc/security/limits.conf
   echo
   echogreen "Updated limits.conf"
   echo
@@ -256,6 +253,7 @@ if [ "$installtomcat" = "y" ]; then
   if [ "$usepack" = "y" ]; then
 		echo "Installing tomcat from package..."
 		$SUDO apt-get $APTVERBOSITY install tomcat7
+		service tomcat7 stop
   else
 	  echo "Downloading tomcat..."
 	  curl -# -L -O $TOMCAT_DOWNLOAD
@@ -515,7 +513,15 @@ echo
     echo "Downloading apply.sh script..."
     $SUDO curl -# -o $ALF_HOME/addons/apply.sh $BASE_DOWNLOAD/scripts/apply.sh
     $SUDO chmod u+x $ALF_HOME/addons/apply.sh
-  fi
+
+	sed -i.bak -e "s;ALF_HOME=*$;ALF_HOME=${ALF_HOME}/g" $ALF_HOME/addons/apply.sh
+	sed -i.bak -e "s;CATALINA_HOME=*$;CATALINA_HOME=${CATALINA_HOME}/g"  $ALF_HOME/addons/apply.sh
+	sed -i.bak -e "s;CATALINA_BASE=*$;CATALINA_BASE=${CATALINA_BASE}/g"  $ALF_HOME/addons/apply.sh
+	sed -i.bak -e "s;CATALINA_CONF=*$;CATALINA_CONF=${CATALINA_CONF}/g"  $ALF_HOME/addons/apply.sh	
+	sed -i.bak -e "s;CATALINA_PID=*$;CATALINA_PID=${CATALINA_PID}/g"  $ALF_HOME/addons/apply.sh
+	sed -i.bak -e "s;ALF_USER=*$;ALF_USER=${ALF_USER}/g"  $ALF_HOME/addons/apply.sh
+
+	fi
   if [ ! -f "$ALF_HOME/addons/alfresco-mmt.jar" ]; then
     $SUDO curl -# -o $ALF_HOME/addons/alfresco-mmt.jar $BASE_DOWNLOAD/scripts/alfresco-mmt.jar
   fi
