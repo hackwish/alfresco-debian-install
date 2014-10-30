@@ -691,7 +691,14 @@ if [ "$installpg" = "y" ]; then
 		read -e -p "Where (127.0.0.1 for local installation) ?" -i "127.0.0.1" psqlserver
 		read -e -p "Root password for $psqlserver/$psqlmask ?" psqlroot
 		read -e -p "Network interface to accessing to psql server (eth0) ?" -i "eth0" psqliface
-		
+		read -e -p "Create Alfresco User ? [y/n] " -i "n" createuser
+		read -e -p "Create Alfresco Database ? [y/n] " -i "n" createdb
+		read -e -p "Set password for postgresql admin account ? [y/n]" -i "n"  setadminpwd
+
+		sed -i.bak -e "s/createdb=y/createdb=$createdb/g" $ALF_HOME/scripts/postgresql.sh
+		sed -i.bak -e "s/createuser=y/createuser=$createuser/g"  $ALF_HOME/scripts/postgresql.sh
+		sed -i.bak -e "s/setadminpwd=y/setadminpwd=$setadminpwd/g" $ALF_HOME/scripts/postgresql.sh
+
 		localip=`ifconfig $psqliface | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
 		localmask=`ifconfig $psqliface | sed -rn '2s/ .*:(.*)$/\1/p'`
 		localnet="$localip\/$localmask"
@@ -706,15 +713,17 @@ if [ "$installpg" = "y" ]; then
 			
 			# Add \ before each / for sed
 			if [ "$psqlserver" != "127.0.0.1" ]; then
+				cp $ALF_HOME/scripts/remote-script.sh $ALF_HOME/scripts/remote-psql.sh
+				chmod a+x $ALF_HOME/scripts/remote-psql.sh
 				echoblue "Install postgresql remotly"
-				if [ -f $ALF_HOME/scripts/remote-script.sh ]; then
-					sed -i.bak -e "s/set remoteip.*/set remoteip $psqlserver/g" $ALF_HOME/scripts/remote-script.sh
-					sed -i.bak -e "s/set rootpassword.*/set rootpassword $psqlroot/g" $ALF_HOME/scripts/remote-script.sh
-					sed -i.bak -e "s/set filename.*/set filename postgresql.sh/g" $ALF_HOME/scripts/remote-script.sh
-					sed -i.bak -e "s;set fullpath.*$;set fullpath ${fullpath};g" $ALF_HOME/scripts/remote-script.sh
+				if [ -f $ALF_HOME/scripts/remote-psql.sh ]; then
+					sed -i.bak -e "s/set remoteip.*/set remoteip $psqlserver/g" $ALF_HOME/scripts/remote-psql.sh
+					sed -i.bak -e "s/set rootpassword.*/set rootpassword $psqlroot/g" $ALF_HOME/scripts/remote-psql.sh
+					sed -i.bak -e "s/set filename.*/set filename postgresql.sh/g" $ALF_HOME/scripts/remote-psql.sh
+					sed -i.bak -e "s;set fullpath.*$;set fullpath ${fullpath};g" $ALF_HOME/scripts/remote-psql.sh
 					
 					# send file and execute to remote server
-					$ALF_HOME/scripts/remote-script.sh
+					$ALF_HOME/scripts/remote-psql.sh
 				else
 					echored "remote-script.sh is missing !"
 					echored "You must install Postgresql manually"
