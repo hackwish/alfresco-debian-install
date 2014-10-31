@@ -717,7 +717,14 @@ if [ "$installpg" = "y" ]; then
 		#Update postgresl script with correct vars
 		if [ -f $ALF_HOME/scripts/postgresql.sh ]; then
 			# Prepare PSQL script installer
-			sed -i.bak -e "s;export ALFRESCOSERVER=.*$;export ALFRESCOSERVER=${localnet};g" $ALF_HOME/scripts/postgresql.sh
+			ALFRESCODB=alfresco
+			ALFRESCOUSER=alfresco
+			ALFRESCOPWD=alfresco
+
+			sed -i.bak -e "s;export ALFRESCOSERVER=.*$;export ALFRESCOSERVER="${localnet}";g" $ALF_HOME/scripts/postgresql.sh
+			sed -i.bak -e "s;export ALFRESCOUSER=.*$;export ALFRESCOUSER="${ALFRESCOUSER}";g" $ALF_HOME/scripts/postgresql.sh
+			sed -i.bak -e "s;export ALFRESCOPWD=.*$;export ALFRESCOPWD="${ALFRESCOPWD}";g" $ALF_HOME/scripts/postgresql.sh
+			sed -i.bak -e "s;export ALFRESCODB=.*$;export ALFRESCODB="${ALFRESCODB}";g" $ALF_HOME/scripts/postgresql.sh
 
 			# Prepare SEND-SCRIPT
 			fullpath="$ALF_HOME/scripts/postgresql.sh"

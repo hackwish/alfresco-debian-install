@@ -31,16 +31,15 @@ echogreen () {
 
 if [ "`which sudo`" = "" ]; then
 	export SUDO=''
-	export SU_POSTGRES='su postgres -c \"'
-	export END_SU='\"'
+	export SU_POSTGRES='su postgres -c '
 else
 	export SUDO='sudo'
 	export SU_POSTGRES='sudo -u postgres'
-	export END_SU=
 fi
 
-export ALFRESCODB=alfresco
-export ALFRESCOUSER=alfresco
+export ALFRESCODB="alfresco"
+export ALFRESCOUSER="alfresco"
+export ALFRESCOPWD="alfresco"
 export ALFRESCOSERVER="127.0.0.1/32"
 export APTVERBOSITY="-qq -y"
 
@@ -58,17 +57,27 @@ echoblue "--------------------------------------------"
 echoblue
 
 if [ "$installpg" = "y" ]; then
-  $SUDO apt-get $APTVERBOSITY update
-  $SUDO apt-get $APTVERBOSITY install postgresql
-  echo
+	echo
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo "Preparing for install. Updating the apt package index files..."
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	$SUDO apt-get $APTVERBOSITY update
+	echo
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo "Installing Postgresql ..."
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+
+	$SUDO apt-get $APTVERBOSITY install postgresql
+	echo
 fi
 
 if [ "$createuser" = "y" ]; then
-  $SU_POSTGRES createuser -D -A -P $ALFRESCOUSER $END_SU
+  # $SU_POSTGRES createuser -D -A -P $ALFRESCOUSER 
+  $SU_POSTGRES "psql -c \"CREATE USER $ALFRESCOUSER WITH PASSWORD '$ALFRESCOPWD';\" "
 fi
 
 if [ "$createdb" = "y" ]; then
-  $SU_POSTGRES createdb -O $ALFRESCOUSER $ALFRESCODB $END_SU
+  $SU_POSTGRES "createdb -O $ALFRESCOUSER $ALFRESCODB"
 fi
 
 
