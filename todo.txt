@@ -86,19 +86,7 @@ AVERTISSEMENT: [SetContextPropertiesRule]{Context} Setting property 'debug' to '
         at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
         at java.lang.Thread.run(Thread.java:745)
 
-- Libre Office
-
- 2014-11-01 18:11:34,286  ERROR [util.exec.RuntimeExecBootstrapBean] [localhost-startStop-1] Bootstrap command failed:
-Execution result:
-   os:         Linux
-   command:    /opt/libreoffice4.2/program/soffice.bin -accept=socket,host=127.0.0.1,port=8100;urp;StarOffice.ServiceManager -env:UserInstallation=file:///opt/alfresco/alf_data/oouser -headless -nocrashreport -nofirststartwizard -nologo -norestore
-   succeeded:  false
-   exit code:  2
-   out:
-   err:        Cannot run program "/opt/libreoffice4.2/program/soffice.bin": error=2, Aucun fichier ou dossier de ce type
-
-   
-   
+  
    
 - 2014-11-01 18:11:58,113  WARN  [alfresco.util.AbstractTriggerBean] [localhost-startStop-1] Job feedNotifierTrigger is not enabled
 
