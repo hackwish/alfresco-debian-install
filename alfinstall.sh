@@ -257,7 +257,7 @@ if [ "$installtomcat" = "y" ]; then
   echogreen "Installing Tomcat"
   if [ "$usepack" = "y" ]; then
 		echo "Installing tomcat from package..."
-		$SUDO apt-get $APTVERBOSITY install tomcat7
+		$SUDO apt-get $APTVERBOSITY install tomcat7 libtcnative-1
 		service tomcat7 stop
   else
 	  echo "Downloading tomcat..."
