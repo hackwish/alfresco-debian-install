@@ -177,6 +177,11 @@ then
 	sed -i.bak -e 's/'"$deb"'/'"$debcontrib"'/g' /etc/apt/sources.list
 	sed -i.bak -e 's/'"$debsec"'/'"$debcontribsec"'/g' /etc/apt/sources.list
 
+	# Add postgresql apt sources
+	# echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" >> /etc/apt/sources.list
+	# $SUDO apt-get $APTVERBOSITY install wget ca-certificates
+	# wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | $SUDO apt-key add -
+
 	echo
 else
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -319,6 +324,7 @@ if [ "$installtomcat" = "y" ]; then
   if [ "$installpg" = "y" ]; then
 	if [ "$usepack" = "y" ]; then
 		$SUDO apt-get $APTVERBOSITY install libpostgresql-jdbc-java
+		 ln -s /usr/share/java/postgresql.jar /usr/share/tomcat7/lib/postgresql.jar
 	else
 		curl -# -O $JDBCPOSTGRESURL/$JDBCPOSTGRES
 		$SUDO mv $JDBCPOSTGRES $CATALINA_HOME/lib
@@ -673,7 +679,7 @@ if [ "$installsolr" = "y" ]; then
   # Remove some unused stuff
   $SUDO rm $ALF_HOME/solr/solr.zip
 
-  sed -i.bak -e "s/index.subsystem.name=*/index.subsystem.name=solr/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+  sed -i.bak -e "s/index.subsystem.name=.*/index.subsystem.name=solr/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
   
   echo
   echogreen "Finished installing Solr engine."

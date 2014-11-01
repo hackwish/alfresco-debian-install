@@ -1,0 +1,102 @@
+AVERTISSEMENT: Problem with directory [/var/lib/tomcat7/shared/lib], exists: [false], isDirectory: [false], canRead: [false]
+INFOS: The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: 
+
+
+- Google Docs Initialization :
+
+ 2014-11-01 18:12:06,966  WARN  [management.subsystems.ChildApplicationContextFactory] [localhost-startStop-1] Startup of 'googledocs' subsystem, ID: [googledocs, v2] failed
+ java.lang.IllegalArgumentException: Cannot merge with object of type [class org.springframework.beans.factory.config.RuntimeBeanReference]
+        at org.springframework.beans.factory.support.ManagedMap.merge(ManagedMap.java:114)
+        at org.springframework.beans.MutablePropertyValues.mergeIfRequired(MutablePropertyValues.java:222)
+        at org.springframework.beans.MutablePropertyValues.addPropertyValue(MutablePropertyValues.java:170)
+        at org.springframework.beans.MutablePropertyValues.addPropertyValues(MutablePropertyValues.java:139)
+        at org.springframework.beans.factory.support.AbstractBeanDefinition.overrideFrom(AbstractBeanDefinition.java:311)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getMergedBeanDefinition(AbstractBeanFactory.java:1185)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getMergedBeanDefinition(AbstractBeanFactory.java:1125)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getMergedLocalBeanDefinition(AbstractBeanFactory.java:1111)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doGetBeanNamesForType(DefaultListableBeanFactory.java:352)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeanNamesForType(DefaultListableBeanFactory.java:327)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeansOfType(DefaultListableBeanFactory.java:437)
+        at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:624)
+        at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:461)
+        at org.alfresco.repo.management.subsystems.ChildApplicationContextFactory$ApplicationContextState.start(ChildApplicationContextFactory.java:809)
+        at org.alfresco.repo.management.subsystems.AbstractPropertyBackedBean.start(AbstractPropertyBackedBean.java:991)
+        at org.alfresco.repo.management.subsystems.AbstractPropertyBackedBean.onApplicationEvent(AbstractPropertyBackedBean.java:530)
+        at org.alfresco.repo.management.SafeApplicationEventMulticaster.multicastEventInternal(SafeApplicationEventMulticaster.java:209)
+        at org.alfresco.repo.management.SafeApplicationEventMulticaster.multicastEvent(SafeApplicationEventMulticaster.java:180)
+        at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:334)
+        at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:948)
+        at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:482)
+        at org.springframework.web.context.ContextLoader.configureAndRefreshWebApplicationContext(ContextLoader.java:410)
+        at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:306)
+        at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:112)
+        at org.alfresco.web.app.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:63)
+        at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:4790)
+        at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5284)
+        at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150)
+        at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:899)
+        at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:875)
+        at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:618)
+        at org.apache.catalina.startup.HostConfig.deployWAR(HostConfig.java:963)
+        at org.apache.catalina.startup.HostConfig$DeployWar.run(HostConfig.java:1600)
+        at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:471)
+        at java.util.concurrent.FutureTask.run(FutureTask.java:262)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+        at java.lang.Thread.run(Thread.java:745)
+2014-11-01 18:12:06,970  ERROR [management.subsystems.AbstractPropertyBackedBean] [localhost-startStop-1] Error auto-starting subsystem
+ java.lang.IllegalArgumentException: Cannot merge with object of type [class org.springframework.beans.factory.config.RuntimeBeanReference]
+        at org.springframework.beans.factory.support.ManagedMap.merge(ManagedMap.java:114)
+        at org.springframework.beans.MutablePropertyValues.mergeIfRequired(MutablePropertyValues.java:222)
+        at org.springframework.beans.MutablePropertyValues.addPropertyValue(MutablePropertyValues.java:170)
+        at org.springframework.beans.MutablePropertyValues.addPropertyValues(MutablePropertyValues.java:139)
+        at org.springframework.beans.factory.support.AbstractBeanDefinition.overrideFrom(AbstractBeanDefinition.java:311)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getMergedBeanDefinition(AbstractBeanFactory.java:1185)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getMergedBeanDefinition(AbstractBeanFactory.java:1125)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getMergedLocalBeanDefinition(AbstractBeanFactory.java:1111)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doGetBeanNamesForType(DefaultListableBeanFactory.java:352)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeanNamesForType(DefaultListableBeanFactory.java:327)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeansOfType(DefaultListableBeanFactory.java:437)
+        at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:624)
+        at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:461)
+        at org.alfresco.repo.management.subsystems.ChildApplicationContextFactory$ApplicationContextState.start(ChildApplicationContextFactory.java:809)
+        at org.alfresco.repo.management.subsystems.AbstractPropertyBackedBean.start(AbstractPropertyBackedBean.java:991)
+        at org.alfresco.repo.management.subsystems.AbstractPropertyBackedBean.onApplicationEvent(AbstractPropertyBackedBean.java:530)
+        at org.alfresco.repo.management.SafeApplicationEventMulticaster.multicastEventInternal(SafeApplicationEventMulticaster.java:209)
+        at org.alfresco.repo.management.SafeApplicationEventMulticaster.multicastEvent(SafeApplicationEventMulticaster.java:180)
+        at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:334)
+        at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:948)
+        at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:482)
+        at org.springframework.web.context.ContextLoader.configureAndRefreshWebApplicationContext(ContextLoader.java:410)
+        at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:306)
+        at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:112)
+        at org.alfresco.web.app.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:63)
+        at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:4790)
+        at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5284)
+        at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150)
+        at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:899)
+        at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:875)
+        at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:618)
+        at org.apache.catalina.startup.HostConfig.deployWAR(HostConfig.java:963)
+        at org.apache.catalina.startup.HostConfig$DeployWar.run(HostConfig.java:1600)
+        at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:471)
+        at java.util.concurrent.FutureTask.run(FutureTask.java:262)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+        at java.lang.Thread.run(Thread.java:745)
+
+- Libre Office
+
+ 2014-11-01 18:11:34,286  ERROR [util.exec.RuntimeExecBootstrapBean] [localhost-startStop-1] Bootstrap command failed:
+Execution result:
+   os:         Linux
+   command:    /opt/libreoffice4.2/program/soffice.bin -accept=socket,host=127.0.0.1,port=8100;urp;StarOffice.ServiceManager -env:UserInstallation=file:///opt/alfresco/alf_data/oouser -headless -nocrashreport -nofirststartwizard -nologo -norestore
+   succeeded:  false
+   exit code:  2
+   out:
+   err:        Cannot run program "/opt/libreoffice4.2/program/soffice.bin": error=2, Aucun fichier ou dossier de ce type
+
+   
+   
+   
+- 2014-11-01 18:11:58,113  WARN  [alfresco.util.AbstractTriggerBean] [localhost-startStop-1] Job feedNotifierTrigger is not enabled
