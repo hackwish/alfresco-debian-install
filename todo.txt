@@ -92,3 +92,5 @@ AVERTISSEMENT: [SetContextPropertiesRule]{Context} Setting property 'debug' to '
 
  2014-11-01 18:19:18,016  WARN  [factory.support.DisposableBeanAdapter] [localhost-startStop-1] Invocation of destroy method 'close' failed on bean with name 'solrSqlSessionTemplate': java.lang.UnsupportedOperationException: Manual close is not allowed over a Spring managed SqlSession
  2014-11-01 18:19:18,016  WARN  [factory.support.DisposableBeanAdapter] [localhost-startStop-1] Invocation of destroy method 'close' failed on bean with name 'activitiesSqlSessionTemplate': java.lang.UnsupportedOperationException: Manual close is not allowed over a Spring managed SqlSession
+
+2014-11-01 18:43:02,542  WARN  [alfresco.util.OpenOfficeConnectionTester] [DefaultScheduler_Worker-9] Error trying to query Open Office version information. OpenOffice.org's ConfigurationRegistry not implemented in this version of OOo. This should not affect the operation of OOo.

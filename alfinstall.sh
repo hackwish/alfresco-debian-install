@@ -187,6 +187,9 @@ else
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo "Non debian OS (Ubuntu ?)"
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	
+	$SUDO curl -# -o /etc/init/alfresco.conf $BASE_DOWNLOAD/tomcat/alfresco.conf
+	$SUDO sed -i "s/@@LOCALESUPPORT@@/$LOCALESUPPORT/g" /etc/init/alfresco.conf
 fi
 
 echo
@@ -259,6 +262,9 @@ if [ "$installtomcat" = "y" ]; then
 		echo "Installing tomcat from package..."
 		$SUDO apt-get $APTVERBOSITY install tomcat7 libtcnative-1
 		service tomcat7 stop
+		
+		echo 'JAVA_OPTS="$JAVA_OPTS -Xms1G -Xmx2G -Xss1024k -XX:MaxPermSize=256m"' >> /etc/default/tomcat7
+		
   else
 	  echo "Downloading tomcat..."
 	  curl -# -L -O $TOMCAT_DOWNLOAD
@@ -276,10 +282,7 @@ if [ "$installtomcat" = "y" ]; then
   echo "Downloading tomcat configuration files..."
   $SUDO curl -# -o $CATALINA_CONF/server.xml $BASE_DOWNLOAD/tomcat/server.xml
   $SUDO curl -# -o $CATALINA_CONF/catalina.properties $BASE_DOWNLOAD/tomcat/catalina.properties
-  $SUDO curl -# -o /etc/init/alfresco.conf $BASE_DOWNLOAD/tomcat/alfresco.conf
-  
-  $SUDO sed -i "s/@@LOCALESUPPORT@@/$LOCALESUPPORT/g" /etc/init/alfresco.conf
-  
+
   # Create /shared
   $SUDO mkdir -p $CATALINA_BASE/shared/classes/alfresco/extension
   $SUDO mkdir -p $CATALINA_BASE/shared/classes/alfresco/web-extension
