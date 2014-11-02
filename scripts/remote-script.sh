@@ -33,6 +33,5 @@ send -- "chmod a+x /tmp/$filename\r"
 expect ":~#"
 send -- "/tmp/$filename\r"
 expect ":~#"
-expect ":~#"
 send -- "exit\r"
 interact
