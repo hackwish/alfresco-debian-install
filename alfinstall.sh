@@ -442,7 +442,7 @@ read -e -p "Install LibreOffice${ques} [y/n] " -i "y" installibreoffice
 if [ "$installibreoffice" = "y" ]; then
 	if [ "$usepack" = "y" ]; then
 		$SUDO apt-get $APTVERBOSITY install libreoffice
-		$OOOEXE="/usr/lib/libreoffice/program/soffice.bin"
+		OOOEXE="/usr/lib/libreoffice/program/soffice.bin"
 	else
 		cd /tmp/alfrescoinstall
 		curl -# -L -O $LIBREOFFICE
@@ -450,7 +450,7 @@ if [ "$installibreoffice" = "y" ]; then
 		cd "$(find . -type d -name "LibreOffice*")"
 		cd DEBS
 		$SUDO dpkg -i *.deb
-		$OOOEXE="/opt/libreoffice4.2/program/soffice.bin"
+		OOOEXE="/opt/libreoffice4.2/program/soffice.bin"
 	fi
 	echoblue "Update alfresco-global.properties"
 	sed -i.bak -e "s;ooo.exe=.*;ooo.exe=$OOOEXE;g" $CATALINA_BASE/shared/classes/alfresco-global.properties
@@ -736,25 +736,7 @@ if [ "$installpg" = "y" ]; then
 		localip=`ifconfig $psqliface | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
 		localmask=`ifconfig $psqliface | sed -rn '2s/ .*:(.*)$/\1/p'`
 		
-		# http://www.linuxquestions.org/questions/programming-9/bash-cidr-calculator-646701/
-		cdirmask=0
-		IFS=.
-		for dec in $localmask ; do
-			case $dec in
-				255) let cdirmask+=8;;
-				254) let cdirmask+=7;;
-				252) let cdirmask+=6;;
-				248) let cdirmask+=5;;
-				240) let cdirmask+=4;;
-				224) let cdirmask+=3;;
-				192) let cdirmask+=2;;
-				128) let cdirmask+=1;;
-				0);;
-				*) echo "Error: $dec is not recognised"; exit 1
-			esac
-		done
-
-		localnet="$localip/$cdirmask"
+		localnet="$localip/32"
 		
 		#Update postgresl script with correct vars
 		if [ -f $ALF_HOME/scripts/postgresql.sh ]; then
@@ -802,9 +784,10 @@ if [ "$installpg" = "y" ]; then
 		if [ "$alfupdate" = "y" ]; then
 			sed -i.bak "s/db.driver=.*/db.driver=org.postgresql.Driver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.username=.*/db.username=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			sed -i.bak "s/db.server=.*/db.server=$psqlserver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.password=.*/db.password=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.name=.*/db.name=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-			sed -i.bak "s;db.url=.*;db.jdbc:postgresql://$psqlserver:5432/${db.name};g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			sed -i.bak "s;db.url=.*;db.url=jdbc:postgresql://$psqlserver:5432/${db.name};g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			
 			service alfresco restart
 		fi
