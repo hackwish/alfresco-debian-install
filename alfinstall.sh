@@ -271,8 +271,8 @@ if [ "$installtomcat" = "y" ]; then
 		$SUDO apt-get $APTVERBOSITY install tomcat7 libtcnative-1
 		service tomcat7 stop
 		
-		echo 'JAVA_OPTS="$JAVA_OPTS -Xms1G -Xmx2G -Xss1024k -XX:MaxPermSize=256m"' >> /etc/default/tomcat7
-		
+		sed -i.bak -e "s/-Xmx128m/-Xms1G -Xmx2G -Xss1024k -XX:MaxPermSize=256m/g" /etc/default/tomcat7
+	
   else
 	  echo "Downloading tomcat..."
 	  curl -# -L -O $TOMCAT_DOWNLOAD
