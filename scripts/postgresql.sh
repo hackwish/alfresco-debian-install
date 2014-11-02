@@ -119,14 +119,14 @@ psqlpath="/etc/postgresql/$psqlversion/main/pg_hba.conf"
 psqlconf="/etc/postgresql/$psqlversion/main/postgresql.conf"
 
 
-pghba="host\talfresco\talfresco\t$ALFRESCOSERVER\tpassword"
+pghba="host	alfresco	alfresco	$ALFRESCOSERVER	password"
 	
 if [ -f $psqlpath ]; then
 	echogreen "file pg_hba.conf was found! update it!"
 	echo $pghba >> $psqlpath
 	echo
 	echogreen "file postgresql.conf was found! update it!"
-	sed -i.bak -e "s/#listen_addresses = 'localhost'/listen_addresses='*'/d" $psqlconf
+	sed -i.bak -e "s/#listen_addresses = 'localhost'/listen_addresses='*'/g" $psqlconf
 	service postgresql restart
 else
 	echored  "Unable to find pg_hba.conf, You must update the configuration file manually"

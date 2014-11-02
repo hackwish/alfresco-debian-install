@@ -1,6 +1,11 @@
-AVERTISSEMENT: Problem with directory [/var/lib/tomcat7/shared/lib], exists: [false], isDirectory: [false], canRead: [false]
+./alfinstall.sh: ligne788: s/db.url=.*/db.jdbc:postgresql://$psqlserver:5432/${db.name}/g : mauvaise substitution
 
+AVERTISSEMENT: Problem with directory [/var/lib/tomcat7/shared/lib], exists: [false], isDirectory: [false], canRead: [false]
 AVERTISSEMENT: [SetContextPropertiesRule]{Context} Setting property 'debug' to '0' did not find a matching property.
+2014-11-01 18:11:58,113  WARN  [alfresco.util.AbstractTriggerBean] [localhost-startStop-1] Job feedNotifierTrigger is not enabled
+2014-11-01 18:19:18,016  WARN  [factory.support.DisposableBeanAdapter] [localhost-startStop-1] Invocation of destroy method 'close' failed on bean with name 'solrSqlSessionTemplate': java.lang.UnsupportedOperationException: Manual close is not allowed over a Spring managed SqlSession
+2014-11-01 18:19:18,016  WARN  [factory.support.DisposableBeanAdapter] [localhost-startStop-1] Invocation of destroy method 'close' failed on bean with name 'activitiesSqlSessionTemplate': java.lang.UnsupportedOperationException: Manual close is not allowed over a Spring managed SqlSession
+2014-11-01 18:43:02,542  WARN  [alfresco.util.OpenOfficeConnectionTester] [DefaultScheduler_Worker-9] Error trying to query Open Office version information. OpenOffice.org's ConfigurationRegistry not implemented in this version of OOo. This should not affect the operation of OOo.
 
 
 - Google Docs Initialization :
@@ -88,9 +93,3 @@ AVERTISSEMENT: [SetContextPropertiesRule]{Context} Setting property 'debug' to '
 
   
    
-- 2014-11-01 18:11:58,113  WARN  [alfresco.util.AbstractTriggerBean] [localhost-startStop-1] Job feedNotifierTrigger is not enabled
-
- 2014-11-01 18:19:18,016  WARN  [factory.support.DisposableBeanAdapter] [localhost-startStop-1] Invocation of destroy method 'close' failed on bean with name 'solrSqlSessionTemplate': java.lang.UnsupportedOperationException: Manual close is not allowed over a Spring managed SqlSession
- 2014-11-01 18:19:18,016  WARN  [factory.support.DisposableBeanAdapter] [localhost-startStop-1] Invocation of destroy method 'close' failed on bean with name 'activitiesSqlSessionTemplate': java.lang.UnsupportedOperationException: Manual close is not allowed over a Spring managed SqlSession
-
-2014-11-01 18:43:02,542  WARN  [alfresco.util.OpenOfficeConnectionTester] [DefaultScheduler_Worker-9] Error trying to query Open Office version information. OpenOffice.org's ConfigurationRegistry not implemented in this version of OOo. This should not affect the operation of OOo.
