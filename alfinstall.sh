@@ -735,7 +735,26 @@ if [ "$installpg" = "y" ]; then
 
 		localip=`ifconfig $psqliface | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
 		localmask=`ifconfig $psqliface | sed -rn '2s/ .*:(.*)$/\1/p'`
-		localnet="$localip/$localmask"
+		
+		# http://www.linuxquestions.org/questions/programming-9/bash-cidr-calculator-646701/
+		cdirmask=0
+		IFS=.
+		for dec in $localmask ; do
+			case $dec in
+				255) let cdirmask+=8;;
+				254) let cdirmask+=7;;
+				252) let cdirmask+=6;;
+				248) let cdirmask+=5;;
+				240) let cdirmask+=4;;
+				224) let cdirmask+=3;;
+				192) let cdirmask+=2;;
+				128) let cdirmask+=1;;
+				0);;
+				*) echo "Error: $dec is not recognised"; exit 1
+			esac
+		done
+
+		localnet="$localip/$cdirmask"
 		
 		#Update postgresl script with correct vars
 		if [ -f $ALF_HOME/scripts/postgresql.sh ]; then
@@ -785,7 +804,7 @@ if [ "$installpg" = "y" ]; then
 			sed -i.bak "s/db.username=.*/db.username=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.password=.*/db.password=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/db.name=.*/db.name=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-			sed -i.bak "s/db.url=.*/db.jdbc:postgresql://$psqlserver:5432/${db.name}/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			sed -i.bak "s;db.url=.*;db.jdbc:postgresql://$psqlserver:5432/${db.name};g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			
 			service alfresco restart
 		fi
@@ -798,9 +817,12 @@ echo
 echogreen "- - - - - - - - - - - - - - - - -"
 echo "Scripted install complete"
 echored "Manual tasks remaining:"
-echo "1. Add database. Install scripts available in $ALF_HOME/scripts"
-echored "   It is however recommended that you use a separate database server."
-echo "2. Verify Tomcat memory and locale settings in /etc/init/alfresco.conf."
+if [ "$installpsql" = "n" ]; then
+	echo "1. Add database. Install scripts available in $ALF_HOME/scripts"
+	echored "   It is however recommended that you use a separate database server."
+fi
+echo "2. Verify Tomcat memory and locale settings in /etc/init/alfresco.conf (FOR UBUNTU)"
+echo "   /etc/default/tomcat7 (FOR DEBIAN)"
 echo "   Alfresco runs best with lots of memory. Add some more to \"lots\" and you will be fine!"
 echo "   Match the locale LC_ALL (or remove) setting to the one used in this script."
 echo "   Locale setting is needed for LibreOffice date handling support."
@@ -808,5 +830,11 @@ echo "3. Update database and other settings in alfresco-global.properties"
 echo "   You will find this file in $CATALINA_BASE/shared/classes"
 echo "4. Update cpu settings in $ALF_HOME/scripts/limitconvert.sh if you have more than 2 cores."
 echo "5. Start nginx if you have installed it: /etc/init.d/nginx start"
-echo "6. Start Alfresco/tomcat: $SUDO service alfresco start"
-echo
+
+read -e -p "Do you want to start tomcat now ?[y/n]" -i "y" start
+if [ "$start" = "y" ]; then
+	service tomcat7 start
+else
+	echo "6. Start Alfresco/tomcat: $SUDO service alfresco start"
+	echo
+fi
