@@ -6,31 +6,44 @@ Update by Yannick MOLINET
 
 !!!!!!!!!! NOT READY FOR USE !!!!!!!!!!!!!!!
 
-- Adapt for Debian
-- Allow to install tomcat7 from package
-- Allow not use sudo
-- Add more vars for installation process (CATALINA_CONF, CATALINA_BASE)
-- Avoid to execute remote scrit by SSH
-- Add script to install JASIG CAS with Apache mod_auth and mod_jk on a remote computer
+- Adapt for Debian -> done
+- Allow to install tomcat7 from package -> done
+- Allow not use sudo -> done
+- 2 installations mode : standard and expert -> todo
+	- standard mode : installation install all necessary package without user confirmation.
+	- expert mode : as the original script, ask user for each options
+- Add more vars for installation process (CATALINA_CONF, CATALINA_BASE) -> done
+- Be able to execute remote script by SSH -> done, fix needed
+- Be able to execute remote Postgresql Installation -> done, fix needed
+- Add script to install JASIG CAS with Apache mod_auth and mod_jk on a remote computer -> todo
 
+On 11/3/2014 -> Installation of all packages and alfresco is working. Alfresco and share are running with some warning
+Google Docs is failed on 5.0.b :
+	https://forums.alfresco.com/forum/installation-upgrades-configuration-integration/installation-upgrades/googledocs-failed-start
+	https://issues.alfresco.com/jira/browse/ACE-2320
 
-Alfresco script based install for Ubuntu servers.
-----------------------------
+Some fix must be done manually (update alfresco-global.properties).
+
+Alfresco script based install for Ubuntu/Debian servers.
+--------------------------------------------------------
 
 This script will help you set up an Alfresco server instance with all necessary third party components.  
-Some will be installed via Ubuntu packages, some directly downloaded. The script will walk you through the process. In the end, there will be some manual tasks to complete the installation.
+Some will be installed via Ubuntu/Debian packages, some could be directly downloaded. The script will walk you through the process. In the end, there will be some manual tasks to complete the installation.
 
 Alfresco does have installers for Linux, and you may be better off with using those installers if you just want to do a quick test install. However, if you intend to run Alfresco in production, this script can help you both with the install, and by examine what the script does, learn what components are involved running an Alfresco instance. Any Alfresco administrator will have to learn that if you intend to use Alfresco in production.
 
 Installing
-----
-To start the install, in Ubuntu terminal run  
+----------
+
+To start the install, in Ubuntu/Debian terminal run  
  
 `curl -O https://raw.githubusercontent.com/ymolinet/alfresco-debian-install/master/alfinstall.sh`  
 `chmod u+x alfinstall.sh`  
 `./alfinstall.sh` 
 
-All install options will be presented with an introduction. They default to 'n' (no), so type y to actually install that component. You need **sudo** access to install.  
+All install options will be presented with an introduction.
+Some options are [y] by default.
+You may **sudo** or not to install.  
 
 But please do read all of this README before you go ahead.  
 There is also lots of documentation at http://docs.alfresco.com/4.2/index.jsp. To become an Alfresco server Administator, read the 'Administering' section.  
@@ -40,7 +53,7 @@ There is also lots of documentation at http://docs.alfresco.com/4.2/index.jsp. T
 >Whenever a new version comes out, the older version is removed from the download server and this script breaks. I try to update as soon as I find out. This is known to happen with LibreOffice and Tomcat. You can check that the download url:s are valid before running the script, the are all in the beginning of the script.
 
 More on the components/installation steps.
-=======
+==========================================
 Once downloaded you can modify (if needed) the script to fit your purpose. Here is a brief explanation if each section.  
 
 Alfresco User
@@ -51,15 +64,21 @@ In this part of the install is also an update to make sure a specific locale is 
 
 Limits
 --------
-Ubuntu default for number of allowed open files in the file system is too low for alfresco use and tomcat may because of this stop with the error "too many open files". You should update this value if you have not done so. Read more at http://wiki.alfresco.com/wiki/Too_many_open_files.
+Ubuntu/Debian default for number of allowed open files in the file system is too low for alfresco use and tomcat may because of this stop with the error "too many open files". You should update this value if you have not done so. Read more at http://wiki.alfresco.com/wiki/Too_many_open_files.
 
 Tomcat
 --------
 Tomcat is the java application server used to actually run Alfresco. The script downloads the latest version of Tomcat 7, and then updates its configuration files to better support running Alfresco.  
+
+== UBUNTU SPECIFIC
 Ubuntu upstart is used to stop and start tomcat. You **must** have a look and verify settings in the alfresco upstart file  
 `/etc/init/alfresco.conf`  
 Edit locale setting (LC_ALL) and the memory settings in this file to match your server.  
 About memory, it has default max set to 2G. That is good enough if you have about 5 users. So add more ram (and then some) to your server, update then Xmx setting in alfresco.conf. Your Alfresco instance will run much smoother.  
+
+== DEBIAN SPECIFIC
+to set Xmx setting on a debian server, set it in /etc/default/tomcat7
+
 
 You will be presented with the option to add either MySql or Postgresql jdbc libraries. You should probably add at least one of them.
 
@@ -105,7 +124,7 @@ If you get the error `no decode delegate for this image format` on start in the 
 
 Alfresco
 ---------
-Download and install of Alfresco itself. Or rather, the alfresco.war and share.war and adds them to tomcat/webapps folder. Current version is 4.2.c.
+Download and install of Alfresco itself. Or rather, the alfresco.war and share.war and adds them to tomcat/webapps folder. Current version is 5.0.b
 You also have the option to install Google Docs and Sharepoint addons. Skip if you do not intend to use them, you can always add then later.
 You can completely skip this step if you intend to use Enterprise version or any other version. See also the special section about the addons directory.
 
@@ -140,6 +159,7 @@ This will make sure libreoffice is running (if not already started and tomcat is
 * `mariadb.sh` - Install the mariadb database server (the MySql alternative). It is recommended that you instead use a dedicated database server. Seriously, do that. And do some database optimizations, out of scope for this install guide.  
 * `postgresql.sh` - Same as for MariaDB, but the postgres version.  
 * `ams.sh` - To do a maintenance shutdown. For more, see section under nginx.  
+* `remote-script.sh`- To do a remote execution of a script.
 
 FAQ  
 ===
