@@ -1,30 +1,31 @@
-Alfresco Ubuntu install
-=======================
+Alfresco Ubuntu/Debian install
+==============================
 
 Update by Yannick MOLINET
 -------------------------
 
 !!!!!!!!!! NOT READY FOR USE !!!!!!!!!!!!!!!
 
-- Adapt for Debian -> done
+- Adapt for Debian -> done (must be tested under ubuntu to check if I have broke something)
 - Allow to install tomcat7 from package -> done
 - Allow not use sudo -> done
+- Allow to configure Alfresco IMAP Server -> done
+- Allow to configure SMTP Server using by Alfresco -> todo
 - 2 installations mode : standard and expert -> todo
 	- standard mode : installation install all necessary package without user confirmation.
 	- expert mode : as the original script, ask user for each options
 - Add more vars for installation process (CATALINA_CONF, CATALINA_BASE) -> done
-- Be able to execute remote script by SSH -> done, fix needed
-- Be able to execute remote Postgresql Installation -> done, fix needed
-- Add script to install JASIG CAS with Apache mod_auth and mod_jk on a remote computer -> todo
-- Add a remote file server using GleisterFS
+- Be able to execute remote script by SSH -> done
+- Be able to execute remote Postgresql Installation -> done, fix needed (must be tested on localhost)
+- Allow to install JASIG CAS with Apache mod_auth and mod_jk on a remote computer -> todo
+- Allow to install a remote file server using GleisterFS
 
-On 11/3/2014 -> Installation of all packages and alfresco is working. Alfresco and share are running with some warning
-Google Docs is failed on 5.0.b :
+On 11/3/2014 -> Installation of all packages and alfresco is working on debian with package. Alfresco and share are running with some warning
+Google Docs is failed on 5.0.b, so I revert to Alfresco 5.0.a
 	https://forums.alfresco.com/forum/installation-upgrades-configuration-integration/installation-upgrades/googledocs-failed-start
 	https://issues.alfresco.com/jira/browse/ACE-2320
 
-Some fix must be done manually (update alfresco-global.properties).
-
+	
 Alfresco script based install for Ubuntu/Debian servers.
 --------------------------------------------------------
 
