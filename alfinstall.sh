@@ -716,6 +716,16 @@ if [ -d "$ALF_HOME/www" ]; then
    $SUDO chown -R www-data:root $ALF_HOME/www
 fi
 
+read -e -p "Enable Alfresco IMAP Server ${ques} [y/n] " -i "y" imap
+if [ "$imap" = "y" ]; then
+	read -e -p "On which interface (eth0) ${ques}" -i "eth0" ifmap
+	bindimap=`ifconfig $ifmap | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+	
+	sed -i.bak "s/#imap.server.enabled=.*/imap.server.enabled=true/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+	sed -i.bak "s/#imap.server.port=.*/imap.server.port=143/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+	sed -i.bak "s/#imap.server.host=.*/imap.server.host=$bindimap/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+fi
+
 if [ "$installpg" = "y" ]; then
 	echo
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -796,10 +806,10 @@ if [ "$installpg" = "y" ]; then
 			sed -i.bak "s/db.port=3306/#db.port=3306/g"  $CATALINA_BASE/shared/classes/alfresco-global.properties
 			sed -i.bak "s/#db.port=5432/db.port=5432/g"  $CATALINA_BASE/shared/classes/alfresco-global.properties
 			
-			sed -i.bak "s/db.url=jdbc:mysql.*/#db.url=jdbc:mysql.*/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-			sed -i.bak "s/#db.url=jdbc:postgresql.*/db.url=jdbc:postgresql.*/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			sed -i.bak "s/db.url=jdbc:mysql.*/#db.url=jdbc:mysql/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			sed -i.bak "s/#db.url=jdbc:postgresql.*/db.url=jdbc:postgresql/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			
-			sed -i.bak "s/db.pool.validate.query=.*/#db.pool.validate.query=.*/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			sed -i.bak "s/db.pool.validate.query=.*/#db.pool.validate.query=/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	
 		fi
 	else 

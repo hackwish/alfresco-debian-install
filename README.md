@@ -16,6 +16,7 @@ Update by Yannick MOLINET
 - Be able to execute remote script by SSH -> done, fix needed
 - Be able to execute remote Postgresql Installation -> done, fix needed
 - Add script to install JASIG CAS with Apache mod_auth and mod_jk on a remote computer -> todo
+- Add a remote file server using GleisterFS
 
 On 11/3/2014 -> Installation of all packages and alfresco is working. Alfresco and share are running with some warning
 Google Docs is failed on 5.0.b :
