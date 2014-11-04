@@ -726,14 +726,26 @@ if [ "$imap" = "y" ]; then
 	sed -i.bak "s/#imap.server.host=.*/imap.server.host=$bindimap/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 fi
 
-read -e -p "Keep default port for CIFS ? [y/n] " -i "y" ports
-if [ "$ports" = "y" ]; then
+read -e -p "Keep default port for CIFS ? [y/n] " -i "y" cifsports
+if [ "$cifsports" = "y" ]; then
 	sed -i.bak -e "s/cifs.tcpipSMB.port=1445/cifs.tcpipSMB.port=445/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	sed -i.bak -e "s/cifs.netBIOSSMB.sessionPort=1139/cifs.netBIOSSMB.sessionPort=139/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	sed -i.bak -e "s/cifs.netBIOSSMB.namePort=1137/cifs.netBIOSSMB.namePort=137/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	sed -i.bak -e "s/cifs.netBIOSSMB.datagramPort=1138/cifs.netBIOSSMB.datagramPort=1138/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 else
-	echored "Keep ports providing by Loftusab !";
+	echored "Keep CIFS ports providing by Loftuxab !";
+fi
+
+read -e -p "Enable FTP Server ? [y/n] " -i "y" ftp
+if [ "$ftp" = "y" ]; then
+	sed -i.bak -e "s/ftp.enabled=false/ftp.enabled=true/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+	if [ "$ftpports" = "y" ]; then
+		sed -i.bak -e "s/ftp.port=2021/ftp.port=21/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+	else
+		echored "Keep ports providing by Loftusab !";
+	fi
+else
+	echored "FTP Server disabled !"
 fi
 
 if [ "$installpg" = "y" ]; then
@@ -764,9 +776,10 @@ if [ "$installpg" = "y" ]; then
 		#Update postgresl script with correct vars
 		if [ -f $ALF_HOME/scripts/postgresql.sh ]; then
 			# Prepare PSQL script installer
-			ALFRESCODB=alfresco
-			ALFRESCOUSER=alfresco
-			ALFRESCOPWD=alfresco
+			
+			read -e -p "Alfresco Database Name ? [alfresco] " -i "alfresco" ALFRESCODB
+			read -e -p "Alfresco Database Username ? [alfresco] " -i "alfresco" ALFRESCOUSER
+			read -e -p "Alfresco Database Password for user $ALFRESCOUSER ? [alfresco] " -i "alfresco" ALFRESCOPWD
 
 			sed -i.bak -e "s;export ALFRESCOSERVER=.*$;export ALFRESCOSERVER="${localnet}";g" $ALF_HOME/scripts/postgresql.sh
 			sed -i.bak -e "s;export ALFRESCOUSER=.*$;export ALFRESCOUSER="${ALFRESCOUSER}";g" $ALF_HOME/scripts/postgresql.sh
@@ -780,7 +793,7 @@ if [ "$installpg" = "y" ]; then
 			if [ "$psqlserver" != "127.0.0.1" ]; then
 				cp $ALF_HOME/scripts/remote-script.sh $ALF_HOME/scripts/remote-psql.sh
 				chmod a+x $ALF_HOME/scripts/remote-psql.sh
-				echoblue "Install postgresql remotly"
+				echoblue "Installing postgresql remotly"
 				if [ -f $ALF_HOME/scripts/remote-psql.sh ]; then
 					sed -i.bak -e "s/set remoteip.*/set remoteip $psqlserver/g" $ALF_HOME/scripts/remote-psql.sh
 					sed -i.bak -e "s/set rootpassword.*/set rootpassword $psqlroot/g" $ALF_HOME/scripts/remote-psql.sh
