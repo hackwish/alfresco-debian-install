@@ -3,6 +3,7 @@ Alfresco Ubuntu/Debian install
 
 Update by Yannick MOLINET
 -------------------------
+this project is a fork of the original project : https://github.com/loftuxab/alfresco-ubuntu-install
 
 On 11/3/2014 -> Installation of all packages and alfresco is working on debian with package. Alfresco and share are running with some warning
 

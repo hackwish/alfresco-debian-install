@@ -127,7 +127,7 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 echo
 read -e -p "Use maximum system package (all except swftools)${ques} [y/n] " -i "y" usepack
 if [ "$usepack" = "y" ]; then
-	export ALF_HOME=/opt/alfresco
+	# export ALF_HOME=/opt/alfresco
 	export CATALINA_HOME=/usr/share/tomcat7
 	export CATALINA_BASE=/var/lib/tomcat7
 	export CATALINA_CONF=/etc/tomcat7
@@ -135,7 +135,7 @@ if [ "$usepack" = "y" ]; then
 	export ALF_USER=tomcat7
 	declare -a REMOTEFILES=($SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP)
 else
-	export ALF_HOME=/opt/alfresco
+	# export ALF_HOME=/opt/alfresco
 	export CATALINA_HOME=$ALF_HOME/tomcat
 	export CATALINA_BASE=$ALF_HOME/tomcat
 	export CATALINA_CONF=$ALF_HOME/tomcat/conf
@@ -143,6 +143,16 @@ else
 	export ALF_USER=alfresco
 	declare -a REMOTEFILES=($TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP)
 fi
+
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo " Define Alfresco Home Path ..."
+echo " You can change (not recommanded) default Alfresco Home Path"
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo
+read -e -p "Define the Alfresco Home Path (not recommanded, default is /opt/alfresco)${ques}" -i "/opt/alfresco" alfhome
+export ALF_HOME=$alfhome
+echo
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -258,6 +268,23 @@ else
   echo "Skipped updating limits.conf"
   echo
 fi
+
+
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
+echo " Do you want to mount Alfresco Primary ContentStore on a GlusterFS mount point ($ALF_HOME/alf_data)? "
+echo " This part don't install any remote service. You must have a valid GlusterFS server available with correct permissions set"
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
+echo
+read -e -p "Do you want to mount alf_data on remote GlusterFS ? [y/n]" -i "n" mount
+if [ "$mount" = y ]; then
+	read -e -p "Specify remote GlusterFS path (ex. GFS-01:/gfsvol):" gfspath
+	$SUDO apt-get $APTVERBOSITY install glusterfs-client
+	mkdir -p $ALF_HOME/alf_data
+	mount -t glusterfs $ALF_HOME/alf_data $gfspath
+	echo "$gfspath  $ALF_HOME/alf_data    glusterfs       defaults,_netdev        0       0" >> /etc/fstab
+fi
+echo
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
