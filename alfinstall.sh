@@ -277,7 +277,7 @@ echo " This part don't install any remote service. You must have a valid Gluster
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
 echo
 read -e -p "Do you want to mount alf_data on remote GlusterFS ? [y/n]" -i "n" mount
-if [ "$mount" = y ]; then
+if [ "$mount" = "y" ]; then
 	read -e -p "Specify remote GlusterFS path (ex. GFS-01:/gfsvol):" gfspath
 	$SUDO apt-get $APTVERBOSITY install glusterfs-client
 	mkdir -p $ALF_HOME/alf_data
