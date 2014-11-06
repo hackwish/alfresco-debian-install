@@ -250,6 +250,75 @@ if [ "$usepack" = "n" ]; then
 	fi
 fi
 
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
+echo "Do you want to install remote GlusterFS Server ?"
+echo "Each server must have the same root password"
+echo "This script don't configure specific network configuration as Jumbo Frame"
+echo "It's recommended to put the brick on a XFS FileSystem"
+echo "Each GlusterFS Server mount /srv/brik as part of the GlusterFS Volume"
+echo "The first server you enter is consider as a 'Master' server and use to create GlusterFS Volume and probe other peer"
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
+read -e -p "Do you want to install remote GlusterFS Server${ques} [y/n] " -i "n" glusterfsserver
+if [ "$glusterfsserver" = "y" ]; then
+	server=array()
+	echo
+	read -e -p "How many remote server to install in the GlusterFS Cluster${ques} [1]" -i "1" glustercount
+	for (( i = 0 ; i < $glustercount ; i++ )) do
+		read -e -p "Enter the Peer's IP:" peerip
+		server+=('$peerip')
+	done
+	
+	read -e -p "Which interface do you use to access GlusterFS Server ? (eth0)" -i "eth0" glusteriface
+	localip=`ifconfig $glusteriface | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+	
+	read -e -p "Enter root password for GlusterFS Peers: " glusterpwd
+	
+	cd /tmp/alfrescoinstall
+	if [ ! -f "/tmp/alfrescoinstall/remote-script.sh" ]; then
+		echo "Downloading script to install remotly ..."
+		$SUDO curl -# -o /tmp/alfrescoinstall/remote-script.sh $BASE_DOWNLOAD/scripts/remote-script.sh
+	fi
+
+	if [ ! -f "/tmp/alfrescoinstall/glusterfs.sh" ]; then
+		echo "Downloading script to install glusterfs ..."
+		$SUDO curl -# -o /tmp/alfrescoinstall/glusterfs-slave.sh $BASE_DOWNLOAD/scripts/glusterfs.sh
+	fi
+	
+	$SUDO chmod u+x /tmp/alfrescoinstall/*.sh
+	
+	sed -i.bak -e "s/GLUSTERPEERS=.*/GLUSTERPEERS=array($server)/g" /tmp/alfrescoinstall/glusterfs-slave.sh
+	sed -i.bak -e "s/ALFRESCOSERVER=.*/ALFRESCOSERVER=$localip/g" /tmp/alfrescoinstall/glusterfs-slave.sh
+
+	cp /tmp/alfrescoinstall/glusterfs-slave.sh /tmp/alfrescoinstall/glusterfs-server.sh
+
+	sed -i.bak -e "s/GLUSTERMASTER=.*/GLUSTERMASTER=y/g" /tmp/alfrescoinstall/glusterfs-server.sh
+	
+	cp /tmp/alfrescoinstall/remote-script.sh /tmp/alfrescoinstall/remote-glusterfs-server.sh
+	cp /tmp/alfrescoinstall/remote-script.sh /tmp/alfrescoinstall/remote-glusterfs-slave.sh
+	$SUDO chmod u+x /tmp/alfrescoinstall/*.sh
+	
+	sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-server.sh
+	sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
+	
+	sed -i.bak -e "s/set filename=.*/set filename=glusterfs-server.sh/g" /tmp/alfrescoinstall/remote-glusterfs-server.sh
+	sed -i.bak -e "s;set fullpath=.*;set fullpath=/tmp/alfrescoinstall/glusterfs-server.sh;g" /tmp/alfrescoinstall/remote-glusterfs-server.sh
+
+	sed -i.bak -e "s/set filename=.*/set filename=glusterfs-slase.sh/g" /tmp/alfrescoinstall/remote-glusterfs-server.sh
+	sed -i.bak -e "s;set fullpath=.*;set fullpath=/tmp/alfrescoinstall/glusterfs-slave.sh;g" /tmp/alfrescoinstall/remote-glusterfs-server.sh
+	
+	for (( i = 0 ; i < ${#server[@]} ; i++ )) do
+		if [ "$i" = 0 ]; then
+			sed -i.bak -e "s/set remoteip=.*/set remoteip=${server[$i]}/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
+			/tmp/alfrescoinstall/remote-glusterfs-master.sh
+		else
+			sed -i.bak -e "s/set remoteip=.*/set remoteip=${server[$i]}/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
+			/tmp/alfrescoinstall/remote-glusterfs-slave.sh
+		fi
+	done
+	
+fi
+  
+
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo "Ubuntu/Debian default for number of allowed open files in the file system is too low"
@@ -617,6 +686,11 @@ echo
 	echo "Downloading script to install remotly ..."
 	$SUDO curl -# -o $ALF_HOME/scripts/remote-script.sh $BASE_DOWNLOAD/scripts/remote-script.sh
   fi
+  if [ ! -f "$ALF_HOME/scripts/glusterfs.sh" ]; then
+	echo "Downloading script to install glusterfs ..."
+	$SUDO curl -# -o $ALF_HOME/scripts/glusterfs.sh $BASE_DOWNLOAD/scripts/glusterfs.sh
+  fi
+
   
   $SUDO chmod u+x $ALF_HOME/scripts/*.sh
 
@@ -798,8 +872,8 @@ if [ "$installpg" = "y" ]; then
 		localip=`ifconfig $psqliface | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
 		localmask=`ifconfig $psqliface | sed -rn '2s/ .*:(.*)$/\1/p'`
 		
-		localnet="$localip/32"
-		
+		localcidr="$localip/32"
+	
 		#Update postgresl script with correct vars
 		if [ -f $ALF_HOME/scripts/postgresql.sh ]; then
 			# Prepare PSQL script installer
@@ -808,7 +882,7 @@ if [ "$installpg" = "y" ]; then
 			read -e -p "Alfresco Database Username ? [alfresco] " -i "alfresco" ALFRESCOUSER
 			read -e -p "Alfresco Database Password for user $ALFRESCOUSER ? [alfresco] " -i "alfresco" ALFRESCOPWD
 
-			sed -i.bak -e "s;export ALFRESCOSERVER=.*$;export ALFRESCOSERVER="${localnet}";g" $ALF_HOME/scripts/postgresql.sh
+			sed -i.bak -e "s;export ALFRESCOSERVER=.*$;export ALFRESCOSERVER="${localcidr}";g" $ALF_HOME/scripts/postgresql.sh
 			sed -i.bak -e "s;export ALFRESCOUSER=.*$;export ALFRESCOUSER="${ALFRESCOUSER}";g" $ALF_HOME/scripts/postgresql.sh
 			sed -i.bak -e "s;export ALFRESCOPWD=.*$;export ALFRESCOPWD="${ALFRESCOPWD}";g" $ALF_HOME/scripts/postgresql.sh
 			sed -i.bak -e "s;export ALFRESCODB=.*$;export ALFRESCODB="${ALFRESCODB}";g" $ALF_HOME/scripts/postgresql.sh
