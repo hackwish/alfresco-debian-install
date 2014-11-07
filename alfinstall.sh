@@ -7,7 +7,7 @@
 # Distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License (CC BY-SA 3.0)
 # -------
 
-export BASE_DOWNLOAD=https://raw.githubusercontent.com/ymolinet/alfresco-debian-install/master
+export BASE_DOWNLOAD=https://raw.githubusercontent.com/dixinfor/alfresco-debian-install/master
 export KEYSTOREBASE=http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/keystore
 
 #Change this to prefered locale to make sure it exists. This has impact on LibreOffice transformations
@@ -76,10 +76,11 @@ cd ./alfrescoinstall
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echogreen "Alfresco Ubuntu installer by Loftux AB."
-echogreen "Updated by Yannick MOLINET to used on debian, with more deb package, manage sudo capacities, and installed some services remotly"
+echogreen "Updated by ADN SYSTEMES / DIXINFOR (Yannick MOLINET) to used on debian,"
+echogreen "with more deb package, manage sudo capacities, and installed some services remotly"
 echogreen "Please read the documentation at"
-echogreen "Original: https://github.com/loftuxab/alfresco-ubuntu-install."
-echogreen "Fork : https://github.com/ymolinet/alfresco-debian-install."
+echogreen "Original: https://github.com/loftuxab/alfresco-ubuntu-install"
+echogreen "Fork : https://github.com/dixinfor/alfresco-debian-install"
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo
 
