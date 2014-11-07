@@ -260,7 +260,7 @@ echo "The first server you enter is consider as a 'Master' server and use to cre
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
 read -e -p "Do you want to install remote GlusterFS Server${ques} [y/n] " -i "n" glusterfsserver
 if [ "$glusterfsserver" = "y" ]; then
-	server=array()
+	server=
 	echo
 	read -e -p "How many remote server to install in the GlusterFS Cluster${ques} [1]" -i "1" glustercount
 	for (( i = 0 ; i < $glustercount ; i++ )) do
@@ -337,6 +337,16 @@ else
   echo "Skipped updating limits.conf"
   echo
 fi
+
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo " Define Alfresco Home Path ..."
+echo " You can change (not recommanded) default Alfresco Home Path"
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo
+read -e -p "Define the Alfresco Home Path (not recommanded, default is /opt/alfresco)${ques}" -i "/opt/alfresco" alfhome
+export ALF_HOME=$alfhome
+echo
 
 
 echo
