@@ -290,22 +290,22 @@ if [ "$glusterfsserver" = "y" ]; then
 	sed -i.bak -e "s/GLUSTERPEERS=.*/GLUSTERPEERS=array($server)/g" /tmp/alfrescoinstall/glusterfs-slave.sh
 	sed -i.bak -e "s/ALFRESCOSERVER=.*/ALFRESCOSERVER=$localip/g" /tmp/alfrescoinstall/glusterfs-slave.sh
 
-	cp /tmp/alfrescoinstall/glusterfs-slave.sh /tmp/alfrescoinstall/glusterfs-server.sh
+	cp /tmp/alfrescoinstall/glusterfs-slave.sh /tmp/alfrescoinstall/glusterfs-master.sh
 
-	sed -i.bak -e "s/GLUSTERMASTER=.*/GLUSTERMASTER=y/g" /tmp/alfrescoinstall/glusterfs-server.sh
+	sed -i.bak -e "s/GLUSTERMASTER=.*/GLUSTERMASTER=y/g" /tmp/alfrescoinstall/glusterfs-master.sh
 	
-	cp /tmp/alfrescoinstall/remote-script.sh /tmp/alfrescoinstall/remote-glusterfs-server.sh
+	cp /tmp/alfrescoinstall/remote-script.sh /tmp/alfrescoinstall/remote-glusterfs-master.sh
 	cp /tmp/alfrescoinstall/remote-script.sh /tmp/alfrescoinstall/remote-glusterfs-slave.sh
 	$SUDO chmod u+x /tmp/alfrescoinstall/*.sh
 	
-	sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-server.sh
+	sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
 	sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
 	
-	sed -i.bak -e "s/set filename=.*/set filename=glusterfs-server.sh/g" /tmp/alfrescoinstall/remote-glusterfs-server.sh
-	sed -i.bak -e "s;set fullpath=.*;set fullpath=/tmp/alfrescoinstall/glusterfs-server.sh;g" /tmp/alfrescoinstall/remote-glusterfs-server.sh
+	sed -i.bak -e "s/set filename=.*/set filename=glusterfs-server.sh/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
+	sed -i.bak -e "s;set fullpath=.*;set fullpath=/tmp/alfrescoinstall/glusterfs-server.sh;g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
 
-	sed -i.bak -e "s/set filename=.*/set filename=glusterfs-slase.sh/g" /tmp/alfrescoinstall/remote-glusterfs-server.sh
-	sed -i.bak -e "s;set fullpath=.*;set fullpath=/tmp/alfrescoinstall/glusterfs-slave.sh;g" /tmp/alfrescoinstall/remote-glusterfs-server.sh
+	sed -i.bak -e "s/set filename=.*/set filename=glusterfs-slase.sh/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
+	sed -i.bak -e "s;set fullpath=.*;set fullpath=/tmp/alfrescoinstall/glusterfs-slave.sh;g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
 	
 	for (( i = 0 ; i < ${#server[@]} ; i++ )) do
 		if [ "$i" = 0 ]; then
