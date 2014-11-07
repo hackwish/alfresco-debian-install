@@ -66,6 +66,7 @@ echogreen () {
   echo "${bldgre}$1${txtrst}"
 }
 
+echogreen "Cleanup Alfresco Install Temp Folder"
 cd /tmp
 if [ -d "alfrescoinstall" ]; then
 	rm -rf alfrescoinstall
