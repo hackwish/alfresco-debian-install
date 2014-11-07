@@ -267,7 +267,7 @@ if [ "$glusterfsserver" = "y" ]; then
 	read -e -p "How many remote server to install in the GlusterFS Cluster${ques} [1]" -i "1" glustercount
 	for (( i = 0 ; i < $glustercount ; i++ )) do
 		read -e -p "Enter the Peer's IP:" peerip
-		server+=('$peerip')
+		server+=($peerip)
 	done
 	
 	read -e -p "Which interface do you use to access GlusterFS Server ? (eth0)" -i "eth0" glusteriface
@@ -310,9 +310,11 @@ if [ "$glusterfsserver" = "y" ]; then
 	
 	for (( i = 0 ; i < ${#server[@]} ; i++ )) do
 		if [ "$i" = 0 ]; then
+			echogreen "Execute GlusterFS Server Installation Script on 'Master' Server: ${server[$i]}"
 			sed -i.bak -e "s/set remoteip=.*/set remoteip=${server[$i]}/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
 			/tmp/alfrescoinstall/remote-glusterfs-master.sh
 		else
+			echogreen "Execute GlusterFS Server Installation Script on 'Slave' Server: ${server[$i]}"
 			sed -i.bak -e "s/set remoteip=.*/set remoteip=${server[$i]}/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
 			/tmp/alfrescoinstall/remote-glusterfs-slave.sh
 		fi
