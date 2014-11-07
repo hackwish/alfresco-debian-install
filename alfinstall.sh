@@ -308,9 +308,9 @@ if [ "$glusterfsserver" = "y" ]; then
 	sed -i.bak -e "s/set filename=.*/set filename=glusterfs-slase.sh/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
 	sed -i.bak -e "s;set fullpath=.*;set fullpath=/tmp/alfrescoinstall/glusterfs-slave.sh;g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
 	
-	echogreen "Number of peers found:  ${server[$i]}"
+	echogreen "Number of peers found:  ${#server[@]}"
 	for (( i = 0 ; i < ${#server[@]} ; i++ )) do
-		if [ "$i" = 0 ]; then
+		if [ $i -eq 0 ]; then
 			echogreen "Execute GlusterFS Server Installation Script on 'Master' Server: ${server[$i]}"
 			sed -i.bak -e "s/set remoteip=.*/set remoteip=${server[$i]}/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
 			/tmp/alfrescoinstall/remote-glusterfs-master.sh
