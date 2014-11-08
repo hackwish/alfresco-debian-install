@@ -38,7 +38,7 @@ fi
 GLUSTERFOLDER="/srv/brik"
 GLUSTERVOLUME="alfrescodata"
 GLUSTERTYPE="replica"
-GLUSTERPEERS=array("127.0.0.1")
+GLUSTERPEERS=("127.0.0.1")
 GLUSTERMASTER="n"
 ALFRESCOSERVER="127.0.0.1"
 APTVERBOSITY="-qq -y"
@@ -103,7 +103,8 @@ if [ "$GLUSTERMASTER" = "y" ]; then
 	
 	glusternode="";
 	
-	for peer in ${GLUSTERPEERS[@]} do
+	for peer in ${GLUSTERPEERS[@]}
+	do
 		echo "Add peer $peer"
 		gluster peer probe $peer
 		$glusternode="$glusternode $peer:/$GLUSTERFOLDER"
@@ -114,7 +115,7 @@ if [ "$GLUSTERMASTER" = "y" ]; then
 	echo
 	
 	echoblue "CREATE GLUSTERFS VOLUME"
-	gluster volume create $GLUSTERVOLUME $GLUSTERTYPE ${#GLUSTERPEERS[@]} $glusternode
+	gluster volume create $GLUSTERVOLUME $GLUSTERTYPE $glusternode
 	echo
 	
 	echoblue "GLUSTERFS VOLUME INFORMATION"

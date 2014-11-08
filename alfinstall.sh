@@ -262,15 +262,48 @@ echo "The first server you enter is consider as a 'Master' server and use to cre
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
 read -e -p "Do you want to install remote GlusterFS Server${ques} [y/n] " -i "n" glusterfsserver
 if [ "$glusterfsserver" = "y" ]; then
-	server=
+	server=()
 	echo
-	read -e -p "How many remote server to install in the GlusterFS Cluster${ques} [1]" -i "1" glustercount
+	read -e -p "How many remote server to install in the GlusterFS Cluster${ques} [1] " -i "1" glustercount
 	for (( i = 0 ; i < $glustercount ; i++ )) do
 		read -e -p "Enter the Peer's IP:" peerip
 		server+=($peerip)
 	done
 	
-	read -e -p "Which interface do you use to access GlusterFS Server ? (eth0)" -i "eth0" glusteriface
+	GLUSTERTYPE=
+	if [ $glustercount -gt 1 ]; then
+		echo
+		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
+		echo "You must defined the Volume Type for your storage environnement."
+		echo "GlusterFS allow : Distributed, Replicated, Striped, Distributed Striped, Distributed Replicated."
+		echo "See what you need on GlusterFS website : http://gluster.org/community/documentation/index.php/Gluster_3.2:_Setting_Up_GlusterFS_Server_Volumes"		
+		echo
+		echo "!!! ONLY Distributed, Replicated, Striped IS MANAGE BY THIS SCRIPT !!!"
+		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
+		read -e -p "Define your volume type:" glustervoltype
+		if [[ "$glustervoltype" = "distributed" || "$glustervoltype" = "Distributed" ]];
+			GLUSTERTYPE=""
+		fi
+		if [[ "$glustervoltype" = "replicated" || "$glustervoltype" = "Replicated" ]];
+			GLUSTERTYPE="replica $glustercount"
+		fi
+		if [[ "$glustervoltype" = "striped" || "$glustervoltype" = "Striped" ]];
+			GLUSTERTYPE="stripe $glustercount" 
+		fi
+		
+		# Maybe be later ...
+		#if [[ "$glustervoltype" = "Distributed Striped" || "$glustervoltype" = "distributed striped" || "$glustervoltype" = "Distributed striped" || "$glustervoltype" = "distributed Striped" ]];
+		#fi
+		#if [[ "$glustervoltype" = "Distributed Replicated" || "$glustervoltype" = "distributed replicated" || "$glustervoltype" = "Distributed replicated" || "$glustervoltype" = "distributed Replicated" ]];
+		#fi
+	else
+		GLUSTERTYPE=""
+	fi
+	
+	read -e -p "Brick location: " -i "/srv/brick" GLUSTERFOLDER
+	read -e -p "Volume name: " -i "alfdata" GLUSTERVOLUME
+	
+	read -e -p "Which interface do you use to access GlusterFS Server ? (eth0) " -i "eth0" glusteriface
 	localip=`ifconfig $glusteriface | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
 	
 	read -e -p "Enter root password for GlusterFS Peers: " glusterpwd
@@ -288,35 +321,39 @@ if [ "$glusterfsserver" = "y" ]; then
 	
 	$SUDO chmod u+x /tmp/alfrescoinstall/*.sh
 	
-	sed -i.bak -e "s/GLUSTERPEERS=.*/GLUSTERPEERS=array($server)/g" /tmp/alfrescoinstall/glusterfs-slave.sh
+	sed -i.bak -e "s/GLUSTERPEERS=.*/GLUSTERPEERS=$server/g" /tmp/alfrescoinstall/glusterfs-slave.sh
 	sed -i.bak -e "s/ALFRESCOSERVER=.*/ALFRESCOSERVER=$localip/g" /tmp/alfrescoinstall/glusterfs-slave.sh
+	sed -i.bak -e "s/GLUSTERFOLDER=.*/GLUSTERFOLDER=$GLUSTERFOLDER/g" /tmp/alfrescoinstall/glusterfs-slave.sh
+	sed -i.bak -e "s/GLUSTERVOLUME=.*/GLUSTERVOLUME=$GLUSTERVOLUME/g" /tmp/alfrescoinstall/glusterfs-slave.sh
 
 	cp /tmp/alfrescoinstall/glusterfs-slave.sh /tmp/alfrescoinstall/glusterfs-master.sh
 
 	sed -i.bak -e "s/GLUSTERMASTER=.*/GLUSTERMASTER=y/g" /tmp/alfrescoinstall/glusterfs-master.sh
+	sed -i.bak -e "s/GLUSTERTYPE=.*/GLUSTERTYPE=$GLUSTERTYPE/g"  /tmp/alfrescoinstall/glusterfs-master.sh
 	
 	cp /tmp/alfrescoinstall/remote-script.sh /tmp/alfrescoinstall/remote-glusterfs-master.sh
 	cp /tmp/alfrescoinstall/remote-script.sh /tmp/alfrescoinstall/remote-glusterfs-slave.sh
 	$SUDO chmod u+x /tmp/alfrescoinstall/*.sh
 	
-	sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
-	sed -i.bak -e "s/set rootpassword=.*/set rootpassword=$glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
+	sed -i.bak -e "s/set rootpassword.*/set rootpassword $glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
+	sed -i.bak -e "s/set rootpassword.*/set rootpassword $glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
 	
-	sed -i.bak -e "s/set filename=.*/set filename=glusterfs-server.sh/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
-	sed -i.bak -e "s;set fullpath=.*;set fullpath=/tmp/alfrescoinstall/glusterfs-server.sh;g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
+	sed -i.bak -e "s/set filename.*/set filename glusterfs-master.sh/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
+	sed -i.bak -e "s;set fullpath.*;set fullpath /tmp/alfrescoinstall/glusterfs-master.sh;g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
 
-	sed -i.bak -e "s/set filename=.*/set filename=glusterfs-slase.sh/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
-	sed -i.bak -e "s;set fullpath=.*;set fullpath=/tmp/alfrescoinstall/glusterfs-slave.sh;g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
+	sed -i.bak -e "s/set filename.*/set filename glusterfs-slase.sh/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
+	sed -i.bak -e "s;set fullpath.*;set fullpath /tmp/alfrescoinstall/glusterfs-slave.sh;g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
 	
 	echogreen "Number of peers found:  ${#server[@]}"
-	for (( i = 0 ; i < ${#server[@]} ; i++ )) do
+	
+	for (( i = ${#server[@]}-1 ; i < 0 ; i-- )) do
 		if [ $i -eq 0 ]; then
 			echogreen "Execute GlusterFS Server Installation Script on 'Master' Server: ${server[$i]}"
-			sed -i.bak -e "s/set remoteip=.*/set remoteip=${server[$i]}/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
+			sed -i.bak -e "s/set remoteip.*/set remoteip ${server[$i]}/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
 			/tmp/alfrescoinstall/remote-glusterfs-master.sh
 		else
 			echogreen "Execute GlusterFS Server Installation Script on 'Slave' Server: ${server[$i]}"
-			sed -i.bak -e "s/set remoteip=.*/set remoteip=${server[$i]}/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
+			sed -i.bak -e "s/set remoteip.*/set remoteip ${server[$i]}/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
 			/tmp/alfrescoinstall/remote-glusterfs-slave.sh
 		fi
 	done
