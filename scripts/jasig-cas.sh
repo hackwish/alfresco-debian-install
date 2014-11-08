@@ -36,9 +36,7 @@ else
 fi
 
 BASE_DOWNLOAD=https://raw.githubusercontent.com/dixinfor/alfresco-debian-install/master
-JASIG_DOWNLOAD=http://downloads.jasig.org/cas/cas-server-4.0.0-release.tar.gz
-HEADER_DOWNLOAD=https://raw.githubusercontent.com/Jasig/cas/master/src/licensing/header.txt
-
+JASIG_GIT=https://github.com/Jasig/cas.git
 APTVERBOSITY="-qq -y"
 FQDN="adnprproxy01.systeme-d.local"
 JASIG_WORK="/opt/work"
@@ -114,6 +112,12 @@ echo "Installing Maven ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 $SUDO apt-get $APTVERBOSITY install maven 
 
+echo
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo "Installing Git ..."
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+$SUDO apt-get $APTVERBOSITY install git 
 
 echo
 echo
@@ -167,24 +171,36 @@ echo "Downloading JASIG CAS ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 mkdir -p $JASIG_WORK
 cd $JASIG_WORK
-$SUDO curl -# -L -O $JASIG_DOWNLOAD
-echo
-echo
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echo "Extracting JASIG CAS ..."
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-tar xf "$(find . -type f -name "cas-server*")"
-CASDIR="$JASIG_WORK/$(find -maxdepth 1 -type d -name 'cas-server*'| head -n1)"
-cd $CASDIR
+git clone $JASIG_GIT
+CASDIR="$JASIG_WORK/$(find -maxdepth 1 -type d -name 'cas*'| head -n1)"
+# $SUDO curl -# -L -O $JASIG_DOWNLOAD
+# echo
+# echo
+# echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+# echo "Extracting JASIG CAS ..."
+# echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+# tar xf "$(find . -type f -name "cas-server*")"
+# CASDIR="$JASIG_WORK/$(find -maxdepth 1 -type d -name 'cas-server*'| head -n1)"
+# cd $CASDIR
 
-if [ ! -f $CASDIR/src/licensing/header.txt ]; then
-	echo "Header is missing !"
-	$SUDO curl -# -o $CASDIR/src/licensing/header.txt $HEADER_DOWNLOAD
-fi
+# https://github.com/Jasig/cas/issues/745
+# if [ ! -f $CASDIR/src/licensing/header.txt ]; then
+# 	echo "header.txt is missing !"
+# 	mkdir -p $CASDIR/src/licensing
+# 	$SUDO curl -# -o $CASDIR/src/licensing/header.txt $HEADER_DOWNLOAD
+# fi
+
+# if [ ! -f $CASDIR/src/licensing/header-definitions.xml ]; then
+# 	echo "header-definitions.xml is missing !"
+# 	mkdir -p $CASDIR/src/licensing
+# 	$SUDO curl -# -o $CASDIR/src/licensing/header-definitions.xml $HEADER_DEFINITIONS_DOWNLOAD
+# fi
+
 
 echo
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo "Compiling JASIG CAS ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+cd $CASDIR
 mvn -Dmaven.test.skip=true package install
