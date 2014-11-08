@@ -161,17 +161,21 @@ Nom : fqdn
 echo
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echo "Preparing JASIG CAS ..."
+echo "Downloading JASIG CAS ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 mkdir -p $JASIG_WORK
 cd $JASIG_WORK
 $SUDO curl -# -L -O $JASIG_DOWNLOAD
-echo "Extracting..."
+echo
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo "Extracting JASIG CAS ..."
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 tar xf "$(find . -type f -name "cas-server*")"
-cd "$(find . -type d -name "cas-server*")"
+cd "$(find -maxdepth 1 -type d -name 'cas-server*'| head -n1)"
 
-echo "Fix licence error"
-sed -i.bak -e "s;<header>${cs.dir}/src/licensing/header.txt</header>;<header>${licenseHeader}</header>;g" pom.xml
+# echo "Fix licence error"
+# sed -i.bak -e "s;${cs.dir}/src/licensing/header.txt;${licenseHeader};g" pom.xml
 
 echo
 echo

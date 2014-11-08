@@ -18,6 +18,7 @@ export JDBCPOSTGRESURL=http://jdbc.postgresql.org/download
 export JDBCPOSTGRES=postgresql-9.3-1102.jdbc41.jar
 export JDBCMYSQLURL=http://cdn.mysql.com/Downloads/Connector-J
 export JDBCMYSQL=mysql-connector-java-5.1.32.tar.gz
+export JASIG_DOWNLOAD=http://downloads.jasig.org/cas/cas-server-4.0.0-release.tar.gz
 
 export LIBREOFFICE=http://download.documentfoundation.org/libreoffice/stable/4.2.6/deb/x86_64/LibreOffice_4.2.6-secfix_Linux_x86-64_deb.tar.gz
 
@@ -135,7 +136,7 @@ if [ "$usepack" = "y" ]; then
 	export CATALINA_CONF=/etc/tomcat7
 	export CATALINA_PID=/var/run/tomcat7.pid
 	export ALF_USER=tomcat7
-	declare -a REMOTEFILES=($SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP)
+	declare -a REMOTEFILES=($SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP $JASIG_DOWNLOAD)
 else
 	# export ALF_HOME=/opt/alfresco
 	export CATALINA_HOME=$ALF_HOME/tomcat
@@ -143,7 +144,7 @@ else
 	export CATALINA_CONF=$ALF_HOME/tomcat/conf
 	export CATALINA_PID=$ALF_HOME/tomcat.pid
 	export ALF_USER=alfresco
-	declare -a REMOTEFILES=($TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP)
+	declare -a REMOTEFILES=($TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP $JASIG_DOWNLOAD)
 fi
 
 echo
@@ -744,6 +745,10 @@ echo
 	echo "Downloading script to install glusterfs ..."
 	$SUDO curl -# -o $ALF_HOME/scripts/glusterfs.sh $BASE_DOWNLOAD/scripts/glusterfs.sh
   fi
+  if [ ! -f "$ALF_HOME/scripts/jasig-cas.sh" ]; then
+	echo "Downloading script to install jasig cas ..."
+	$SUDO curl -# -o $ALF_HOME/scripts/jasig-cas.sh $BASE_DOWNLOAD/scripts/jasig-cas.sh
+  fi
 
   
   $SUDO chmod u+x $ALF_HOME/scripts/*.sh
@@ -992,6 +997,29 @@ if [ "$installpg" = "y" ]; then
 		echored "You have installed and/or configured your PSQL Server manually"
 	fi
 fi
+
+read -e -p "Do you want to install a JASIG CAS Server ? [y/n] " -i "n" jasigcas
+if [ "$jasigcas" = "y" ]; then
+	cp $ALF_HOME/scripts/remote-script.sh $ALF_HOME/scripts/remote-jasig-cas.sh
+	chmod u+x $ALF_HOME/scripts/remote-jasig-cas.sh
+	#JASIG_WORK="/opt/work"
+	read -e -p "Enter JASIG CAS IP Address: " casip
+	read -e -p "Enter root password: " caspwd
+	read -e -p "Enter the JASIG CAS FQDN: " FQDN
+
+	sed -i.bak -e "s/JASIG_DOWNLOAD=.*/JASIG_DOWNLOAD=$JASIG_DOWNLOAD/g" $ALF_HOME/scripts/jasig-cas.sh
+	sed -i.bak -e "s/FQDN=.*/FQDN=$FQDN/g" $ALF_HOME/scripts/jasig-cas.sh
+	
+	fullpath="$ALF_HOME/scripts/jasig-cas.sh"
+	
+	sed -i.bak -e "s/set remoteip.*/set remoteip $casip/g" $ALF_HOME/scripts/remote-jasig-cas.sh
+	sed -i.bak -e "s/set rootpassword.*/set rootpassword $caspwd/g" $ALF_HOME/scripts/remote-jasig-cas.sh
+	sed -i.bak -e "s/set filename.*/set filename jasig-cas.sh/g" $ALF_HOME/scripts/remote-jasig-cas.sh
+	sed -i.bak -e "s;set fullpath.*$;set fullpath ${fullpath};g" $ALF_HOME/scripts/remote-jasig-cas.sh
+	
+	$ALF_HOME/scripts/remote-jasig-cas.sh
+fi
+
 
 echo
 echogreen "- - - - - - - - - - - - - - - - -"
