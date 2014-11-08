@@ -101,13 +101,13 @@ if [ "$GLUSTERMASTER" = "y" ]; then
 	echo "We are on the 'master' GlusterFS Server, Create VOLUME and Add PEERS"
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	
-	glusternode="";
+	glusternode=""
 	
 	for peer in ${GLUSTERPEERS[@]}
 	do
 		echo "Add peer $peer"
 		gluster peer probe $peer
-		$glusternode="$glusternode $peer:/$GLUSTERFOLDER"
+		glusternode="$glusternode $peer:/$GLUSTERFOLDER"
 	done
 	
 	echoblue "PEERS STATUS"
@@ -130,8 +130,8 @@ if [ "$GLUSTERMASTER" = "y" ]; then
 	gluster volume info
 	echo
 
-	echoblue "ALLOW CLIENT TO ACCESS THE GLUSTERFS VOLUME"
-	gluster volume set $GLUSTERVOLUME auth.allow $ALFRESCOSERVER
+	# echoblue "ALLOW CLIENT TO ACCESS THE GLUSTERFS VOLUME"
+	# gluster volume set $GLUSTERVOLUME auth.allow $ALFRESCOSERVER
 fi
 
 
