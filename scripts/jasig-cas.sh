@@ -37,6 +37,8 @@ fi
 
 BASE_DOWNLOAD=https://raw.githubusercontent.com/dixinfor/alfresco-debian-install/master
 JASIG_DOWNLOAD=http://downloads.jasig.org/cas/cas-server-4.0.0-release.tar.gz
+HEADER_DOWNLOAD=https://raw.githubusercontent.com/Jasig/cas/master/src/licensing/header.txt
+
 APTVERBOSITY="-qq -y"
 FQDN="adnprproxy01.systeme-d.local"
 JASIG_WORK="/opt/work"
@@ -172,10 +174,13 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 echo "Extracting JASIG CAS ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 tar xf "$(find . -type f -name "cas-server*")"
-cd "$(find -maxdepth 1 -type d -name 'cas-server*'| head -n1)"
+CASDIR="$JASIG_WORK/$(find -maxdepth 1 -type d -name 'cas-server*'| head -n1)"
+cd $CASDIR
 
-# echo "Fix licence error"
-# sed -i.bak -e "s;${cs.dir}/src/licensing/header.txt;${licenseHeader};g" pom.xml
+if [ ! -f $CASDIR/src/licensing/header.txt ]; then
+	echo "Header is missing !"
+	$SUDO curl -# -o $CASDIR/src/licensing/header.txt $HEADER_DOWNLOAD
+fi
 
 echo
 echo
