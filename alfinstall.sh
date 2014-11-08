@@ -396,10 +396,15 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 echo
 read -e -p "Do you want to mount alf_data on remote GlusterFS ? [y/n]" -i "n" mount
 if [ "$mount" = "y" ]; then
-	read -e -p "Specify remote GlusterFS path (ex. GFS-01:/gfsvol):" gfspath
+	example="GFS-SRV01:gfsvol"
+	if [ "$glusterfsserver" = "y" ]; then
+		example="${server[0]}:$GLUSTERVOLUME"
+	fi
+	
+	read -e -p "Specify remote GlusterFS path (ex. $example):" gfspath
 	$SUDO apt-get $APTVERBOSITY install glusterfs-client
 	mkdir -p $ALF_HOME/alf_data
-	mount -t glusterfs $ALF_HOME/alf_data $gfspath
+	mount -t glusterfs $gfspath $ALF_HOME/alf_data
 	echo "$gfspath  $ALF_HOME/alf_data    glusterfs       defaults,_netdev        0       0" >> /etc/fstab
 fi
 echo
