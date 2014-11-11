@@ -37,6 +37,7 @@ fi
 
 BASE_DOWNLOAD=https://raw.githubusercontent.com/dixinfor/alfresco-debian-install/master
 JASIG_GIT=https://github.com/Jasig/cas.git
+CATALINA_CONF="/etc/tomcat7"
 APTVERBOSITY="-qq -y"
 FQDN="adnprproxy01.systeme-d.local"
 JASIG_WORK="/opt/work"
@@ -126,6 +127,16 @@ echo "Retrieve auth-cas.conf ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 $SUDO curl -# -o /etc/apache2/mods-available/auth_cas.conf $BASE_DOWNLOAD/apache2/auth_cas.conf
 sed -i.bak -e "s;@@FQDN@@;$FQDN;g" /etc/apache2/mods-available/auth_cas.conf
+
+echo
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo "Update Apache2 mod_jk for Tomcat 7 ..."
+echo "mod_jk is configured to use tomcat6 by default. Update path"
+echo "mod_jk already have a worker, named ajp13_worker, define for localhost"
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+sed -i.bak -e "s/tomcat6/tomcat7/g" /etc/libapache2-mod-jk/workers.properties
+
 echo
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -152,17 +163,11 @@ echo "Stop Tomcat7 ..."
 service tomcat7 stop
 
 echo
-echo "Enable SSL on port 8443"
-sed -i.bak -e 's;<!-- <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true" maxThreads="150" scheme="https" secure="true" clientAuth="false" sslProtocol="TLS" /> -->;<Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true" maxThreads="150" scheme="https" secure="true" clientAuth="false" sslProtocol="TLS" />;g' /etc/tomcat7/server.xml
-
-echo "Enable AJP on port 8009"
-sed -i.bak -e 's;<!-- <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" /> -->;<Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />;g' /etc/tomcat7/server.xml
+echo "Update Tomcat 7 server.xml"
+$SUDO curl -# -o $CATALINA_CONF/server.xml $BASE_DOWNLOAD/tomcat-alfresco/server.xml
 
 echo "Generate keystore"
 keytool -genkey -alias tomcat -keyalg RSA -storepass changeit -noprompt -validity 365 -keystore /usr/share/tomcat7/.keystore
-
-Nom : fqdn
-
 
 echo
 echo
@@ -173,29 +178,9 @@ mkdir -p $JASIG_WORK
 cd $JASIG_WORK
 git clone $JASIG_GIT
 CASDIR="$JASIG_WORK/$(find -maxdepth 1 -type d -name 'cas*'| head -n1)"
-# $SUDO curl -# -L -O $JASIG_DOWNLOAD
-# echo
-# echo
-# echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-# echo "Extracting JASIG CAS ..."
-# echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-# tar xf "$(find . -type f -name "cas-server*")"
-# CASDIR="$JASIG_WORK/$(find -maxdepth 1 -type d -name 'cas-server*'| head -n1)"
-# cd $CASDIR
 
-# https://github.com/Jasig/cas/issues/745
-# if [ ! -f $CASDIR/src/licensing/header.txt ]; then
-# 	echo "header.txt is missing !"
-# 	mkdir -p $CASDIR/src/licensing
-# 	$SUDO curl -# -o $CASDIR/src/licensing/header.txt $HEADER_DOWNLOAD
-# fi
-
-# if [ ! -f $CASDIR/src/licensing/header-definitions.xml ]; then
-# 	echo "header-definitions.xml is missing !"
-# 	mkdir -p $CASDIR/src/licensing
-# 	$SUDO curl -# -o $CASDIR/src/licensing/header-definitions.xml $HEADER_DEFINITIONS_DOWNLOAD
-# fi
-
+#TODO : Adjust log path
+#TODO : Configuration for LDAP
 
 echo
 echo
@@ -204,3 +189,23 @@ echo "Compiling JASIG CAS ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 cd $CASDIR
 mvn -Dmaven.test.skip=true package install
+
+echo
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo "Copying JASIG CAS ..."
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+if [ -e $CATALINA_BASE/webapps/cas.war ]; then
+	echo "Backing up existing cas.war"
+	mv $CATALINA_BASE/webapps/cas.war $CATALINA_BASE/webapps/cas.war.old
+fi
+echo "Moving new cas.war to tomcat..."
+mv $CASDIR/cas-server-webapp/target/cas.war $CATALINA_BASE/webapps/cas.war
+
+echo
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo "Starting Tomcat ..."
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+service tomcat7 start
+

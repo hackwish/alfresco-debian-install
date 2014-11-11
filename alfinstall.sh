@@ -202,7 +202,7 @@ else
 	echo "Non debian OS (Ubuntu ?)"
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	
-	$SUDO curl -# -o /etc/init/alfresco.conf $BASE_DOWNLOAD/tomcat/alfresco.conf
+	$SUDO curl -# -o /etc/init/alfresco.conf $BASE_DOWNLOAD/tomcat-alfresco/alfresco.conf
 	$SUDO sed -i "s/@@LOCALESUPPORT@@/$LOCALESUPPORT/g" /etc/init/alfresco.conf
 fi
 
@@ -424,7 +424,7 @@ if [ "$installtomcat" = "y" ]; then
 		echo "Installing tomcat from package..."
 		$SUDO apt-get $APTVERBOSITY install tomcat7 libtcnative-1
 		service tomcat7 stop
-		
+		echo "Set memory setting for JAVA ..."
 		sed -i.bak -e "s/-Xmx128m/-Xms1G -Xmx2G -Xss1024k -XX:MaxPermSize=256m/g" /etc/default/tomcat7
 	
   else
@@ -442,8 +442,8 @@ if [ "$installtomcat" = "y" ]; then
   
   # Get Alfresco config
   echo "Downloading tomcat configuration files..."
-  $SUDO curl -# -o $CATALINA_CONF/server.xml $BASE_DOWNLOAD/tomcat/server.xml
-  $SUDO curl -# -o $CATALINA_CONF/catalina.properties $BASE_DOWNLOAD/tomcat/catalina.properties
+  $SUDO curl -# -o $CATALINA_CONF/server.xml $BASE_DOWNLOAD/tomcat-alfresco/server.xml
+  $SUDO curl -# -o $CATALINA_CONF/catalina.properties $BASE_DOWNLOAD/tomcat-alfresco/catalina.properties
 
   # Create /shared
   $SUDO mkdir -p $CATALINA_BASE/shared/classes/alfresco/extension
@@ -468,7 +468,7 @@ if [ "$installtomcat" = "y" ]; then
 
   # Add default alfresco-global.propertis
   ALFRESCO_GLOBAL_PROPERTIES=/tmp/alfrescoinstall/alfresco-global.properties
-  $SUDO curl -# -o $ALFRESCO_GLOBAL_PROPERTIES $BASE_DOWNLOAD/tomcat/alfresco-global.properties
+  $SUDO curl -# -o $ALFRESCO_GLOBAL_PROPERTIES $BASE_DOWNLOAD/tomcat-alfresco/alfresco-global.properties
   sed -i "s/@@ALFRESCO_SHARE_SERVER@@/$SHARE_HOSTNAME/g" $ALFRESCO_GLOBAL_PROPERTIES
   sed -i "s/@@ALFRESCO_SHARE_SERVER_PORT@@/$SHARE_PORT/g" $ALFRESCO_GLOBAL_PROPERTIES
   sed -i "s/@@ALFRESCO_SHARE_SERVER_PROTOCOL@@/$SHARE_PROTOCOL/g" $ALFRESCO_GLOBAL_PROPERTIES
@@ -478,7 +478,7 @@ if [ "$installtomcat" = "y" ]; then
   read -e -p "Install Share config file (recommended)${ques} [y/n] " -i "y" installshareconfig
   if [ "$installshareconfig" = "y" ]; then
     SHARE_CONFIG_CUSTOM=/tmp/alfrescoinstall/share-config-custom.xml
-    $SUDO curl -# -o $SHARE_CONFIG_CUSTOM $BASE_DOWNLOAD/tomcat/share-config-custom.xml
+    $SUDO curl -# -o $SHARE_CONFIG_CUSTOM $BASE_DOWNLOAD/tomcat-alfresco/share-config-custom.xml
     sed -i "s/@@ALFRESCO_SHARE_SERVER@@/$SHARE_HOSTNAME/g" $SHARE_CONFIG_CUSTOM
     sed -i "s/@@ALFRESCO_REPO_SERVER@@/$REPO_HOSTNAME/g" $SHARE_CONFIG_CUSTOM
     $SUDO mv $SHARE_CONFIG_CUSTOM $CATALINA_BASE/shared/classes/alfresco/web-extension/
@@ -833,7 +833,7 @@ if [ "$installsolr" = "y" ]; then
   $SUDO mkdir -p $CATALINA_CONF/Catalina/localhost
   $SUDO curl -# -o $ALF_HOME/solr/solr.zip $SOLR
   $SUDO curl -# -o $ALF_HOME/solr/apache-solr-1.4.1.war $SOLRWAR
-  $SUDO curl -# -o $CATALINA_CONF/tomcat-users.xml $BASE_DOWNLOAD/tomcat/tomcat-users.xml
+  $SUDO curl -# -o $CATALINA_CONF/tomcat-users.xml $BASE_DOWNLOAD/tomcat-alfresco/tomcat-users.xml
   cd $ALF_HOME/solr/
 
   $SUDO unzip -q solr.zip
