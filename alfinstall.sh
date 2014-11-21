@@ -68,12 +68,13 @@ echogreen () {
 }
 
 echogreen "Cleanup Alfresco Install Temp Folder"
-cd /tmp
-if [ -d "alfrescoinstall" ]; then
-	rm -rf alfrescoinstall
+TMPFOLDER="/tmp/alfinstall"
+
+if [ -d $TMPFOLDER ]; then
+	rm -rf $TMPFOLDER
 fi
-mkdir alfrescoinstall
-cd ./alfrescoinstall
+mkdir $TMPFOLDER
+cd $TMPFOLDER
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -304,41 +305,41 @@ if [ "$glusterfsserver" = "y" ]; then
 	
 	read -e -p "Enter root password for GlusterFS Peers: " glusterpwd
 	
-	cd /tmp/alfrescoinstall
-	if [ ! -f "/tmp/alfrescoinstall/remote-script.sh" ]; then
+	cd $TMPFOLDER
+	if [ ! -f "$TMPFOLDER/remote-script.sh" ]; then
 		echo "Downloading script to install remotly ..."
-		$SUDO curl -# -o /tmp/alfrescoinstall/remote-script.sh $BASE_DOWNLOAD/scripts/remote-script.sh
+		$SUDO curl -# -o $TMPFOLDER/remote-script.sh $BASE_DOWNLOAD/scripts/remote-script.sh
 	fi
 
-	if [ ! -f "/tmp/alfrescoinstall/glusterfs.sh" ]; then
+	if [ ! -f "$TMPFOLDER/glusterfs.sh" ]; then
 		echo "Downloading script to install glusterfs ..."
-		$SUDO curl -# -o /tmp/alfrescoinstall/glusterfs-slave.sh $BASE_DOWNLOAD/scripts/glusterfs.sh
+		$SUDO curl -# -o $TMPFOLDER/glusterfs-slave.sh $BASE_DOWNLOAD/scripts/glusterfs.sh
 	fi
 	
-	$SUDO chmod u+x /tmp/alfrescoinstall/*.sh
+	$SUDO chmod u+x $TMPFOLDER/*.sh
 	
-	sed -i.bak -e "s/GLUSTERPEERS=.*/GLUSTERPEERS=$server/g" /tmp/alfrescoinstall/glusterfs-slave.sh
-	sed -i.bak -e "s/ALFRESCOSERVER=.*/ALFRESCOSERVER=$localip/g" /tmp/alfrescoinstall/glusterfs-slave.sh
-	sed -i.bak -e "s;GLUSTERFOLDER=.*;GLUSTERFOLDER=$GLUSTERFOLDER;g" /tmp/alfrescoinstall/glusterfs-slave.sh
-	sed -i.bak -e "s/GLUSTERVOLUME=.*/GLUSTERVOLUME=$GLUSTERVOLUME/g" /tmp/alfrescoinstall/glusterfs-slave.sh
+	sed -i.bak -e "s/GLUSTERPEERS=.*/GLUSTERPEERS=$server/g" $TMPFOLDER/glusterfs-slave.sh
+	sed -i.bak -e "s/ALFRESCOSERVER=.*/ALFRESCOSERVER=$localip/g" $TMPFOLDER/glusterfs-slave.sh
+	sed -i.bak -e "s;GLUSTERFOLDER=.*;GLUSTERFOLDER=$GLUSTERFOLDER;g" $TMPFOLDER/glusterfs-slave.sh
+	sed -i.bak -e "s/GLUSTERVOLUME=.*/GLUSTERVOLUME=$GLUSTERVOLUME/g" $TMPFOLDER/glusterfs-slave.sh
 
-	cp /tmp/alfrescoinstall/glusterfs-slave.sh /tmp/alfrescoinstall/glusterfs-master.sh
+	cp $TMPFOLDER/glusterfs-slave.sh $TMPFOLDER/glusterfs-master.sh
 
-	sed -i.bak -e "s/GLUSTERMASTER=.*/GLUSTERMASTER=y/g" /tmp/alfrescoinstall/glusterfs-master.sh
-	sed -i.bak -e "s/GLUSTERTYPE=.*/GLUSTERTYPE=$GLUSTERTYPE/g"  /tmp/alfrescoinstall/glusterfs-master.sh
+	sed -i.bak -e "s/GLUSTERMASTER=.*/GLUSTERMASTER=y/g" $TMPFOLDER/glusterfs-master.sh
+	sed -i.bak -e "s/GLUSTERTYPE=.*/GLUSTERTYPE=$GLUSTERTYPE/g"  $TMPFOLDER/glusterfs-master.sh
 	
-	cp /tmp/alfrescoinstall/remote-script.sh /tmp/alfrescoinstall/remote-glusterfs-master.sh
-	cp /tmp/alfrescoinstall/remote-script.sh /tmp/alfrescoinstall/remote-glusterfs-slave.sh
-	$SUDO chmod u+x /tmp/alfrescoinstall/*.sh
+	cp $TMPFOLDER/remote-script.sh $TMPFOLDER/remote-glusterfs-master.sh
+	cp $TMPFOLDER/remote-script.sh $TMPFOLDER/remote-glusterfs-slave.sh
+	$SUDO chmod u+x $TMPFOLDER/*.sh
 	
-	sed -i.bak -e "s/set rootpassword.*/set rootpassword $glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
-	sed -i.bak -e "s/set rootpassword.*/set rootpassword $glusterpwd/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
+	sed -i.bak -e "s/set rootpassword.*/set rootpassword $glusterpwd/g" $TMPFOLDER/remote-glusterfs-master.sh
+	sed -i.bak -e "s/set rootpassword.*/set rootpassword $glusterpwd/g" $TMPFOLDER/remote-glusterfs-slave.sh
 	
-	sed -i.bak -e "s/set filename.*/set filename glusterfs-master.sh/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
-	sed -i.bak -e "s;set fullpath.*;set fullpath /tmp/alfrescoinstall/glusterfs-master.sh;g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
+	sed -i.bak -e "s/set filename.*/set filename glusterfs-master.sh/g" $TMPFOLDER/remote-glusterfs-master.sh
+	sed -i.bak -e "s;set fullpath.*;set fullpath $TMPFOLDER/glusterfs-master.sh;g" $TMPFOLDER/remote-glusterfs-master.sh
 
-	sed -i.bak -e "s/set filename.*/set filename glusterfs-slase.sh/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
-	sed -i.bak -e "s;set fullpath.*;set fullpath /tmp/alfrescoinstall/glusterfs-slave.sh;g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
+	sed -i.bak -e "s/set filename.*/set filename glusterfs-slase.sh/g" $TMPFOLDER/remote-glusterfs-slave.sh
+	sed -i.bak -e "s;set fullpath.*;set fullpath $TMPFOLDER/glusterfs-slave.sh;g" $TMPFOLDER/remote-glusterfs-slave.sh
 	
 	echogreen "Number of peers found:  ${#server[@]}"
 	
@@ -347,12 +348,12 @@ if [ "$glusterfsserver" = "y" ]; then
 		if [[ $i -eq 1 ]]
 		then
 			echogreen "Execute GlusterFS Server Installation Script on 'Master' Server: ${server[$i-1]}"
-			sed -i.bak -e "s/set remoteip.*/set remoteip ${server[$i-1]}/g" /tmp/alfrescoinstall/remote-glusterfs-master.sh
-			/tmp/alfrescoinstall/remote-glusterfs-master.sh
+			sed -i.bak -e "s/set remoteip.*/set remoteip ${server[$i-1]}/g" $TMPFOLDER/remote-glusterfs-master.sh
+			$TMPFOLDER/remote-glusterfs-master.sh
 		else
 			echogreen "Execute GlusterFS Server Installation Script on 'Slave' Server: ${server[$i-1]}"
-			sed -i.bak -e "s/set remoteip.*/set remoteip ${server[$i-1]}/g" /tmp/alfrescoinstall/remote-glusterfs-slave.sh
-			/tmp/alfrescoinstall/remote-glusterfs-slave.sh
+			sed -i.bak -e "s/set remoteip.*/set remoteip ${server[$i-1]}/g" $TMPFOLDER/remote-glusterfs-slave.sh
+			$TMPFOLDER/remote-glusterfs-slave.sh
 		fi
 	done
 	
@@ -467,7 +468,7 @@ if [ "$installtomcat" = "y" ]; then
   read -e -p "Please enter the host name for Alfresco Repository server (fully qualified domain name)${ques} [$SHARE_HOSTNAME] " -i "$SHARE_HOSTNAME" REPO_HOSTNAME
 
   # Add default alfresco-global.propertis
-  ALFRESCO_GLOBAL_PROPERTIES=/tmp/alfrescoinstall/alfresco-global.properties
+  ALFRESCO_GLOBAL_PROPERTIES=$TMPFOLDER/alfresco-global.properties
   $SUDO curl -# -o $ALFRESCO_GLOBAL_PROPERTIES $BASE_DOWNLOAD/tomcat-alfresco/alfresco-global.properties
   sed -i "s/@@ALFRESCO_SHARE_SERVER@@/$SHARE_HOSTNAME/g" $ALFRESCO_GLOBAL_PROPERTIES
   sed -i "s/@@ALFRESCO_SHARE_SERVER_PORT@@/$SHARE_PORT/g" $ALFRESCO_GLOBAL_PROPERTIES
@@ -477,7 +478,7 @@ if [ "$installtomcat" = "y" ]; then
 
   read -e -p "Install Share config file (recommended)${ques} [y/n] " -i "y" installshareconfig
   if [ "$installshareconfig" = "y" ]; then
-    SHARE_CONFIG_CUSTOM=/tmp/alfrescoinstall/share-config-custom.xml
+    SHARE_CONFIG_CUSTOM=$TMPFOLDER/share-config-custom.xml
     $SUDO curl -# -o $SHARE_CONFIG_CUSTOM $BASE_DOWNLOAD/tomcat-alfresco/share-config-custom.xml
     sed -i "s/@@ALFRESCO_SHARE_SERVER@@/$SHARE_HOSTNAME/g" $SHARE_CONFIG_CUSTOM
     sed -i "s/@@ALFRESCO_REPO_SERVER@@/$REPO_HOSTNAME/g" $SHARE_CONFIG_CUSTOM
@@ -501,7 +502,7 @@ if [ "$installtomcat" = "y" ]; then
 		if [ "$usepack" = "y" ]; then
 			$SUDO apt-get $APTVERBOSITY install libmysql-java
 		else
-			cd /tmp/alfrescoinstall
+			cd $TMPFOLDER
 			curl -# -L -O $JDBCMYSQLURL/$JDBCMYSQL
 			tar xf $JDBCMYSQL
 			cd "$(find . -type d -name "mysql-connector*")"
@@ -534,8 +535,8 @@ if [ "$installnginx" = "y" ]; then
   echo
 $SUDO -s << EOF
   echo "deb http://nginx.org/packages/mainline/ubuntu $(lsb_release -cs) nginx" >> /etc/apt/sources.list
-  $SUDO curl -# -o /tmp/alfrescoinstall/nginx_signing.key http://nginx.org/keys/nginx_signing.key
-  apt-key add /tmp/alfrescoinstall/nginx_signing.key
+  $SUDO curl -# -o $TMPFOLDER/nginx_signing.key http://nginx.org/keys/nginx_signing.key
+  apt-key add $TMPFOLDER/nginx_signing.key
   #echo "deb http://ppa.launchpad.net/nginx/stable/ubuntu $(lsb_release -cs) main" >> /etc/apt/sources.list
   #apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C300EE8C
   # Alternate with spdy support and more, change  apt install -> nginx-custom
@@ -598,7 +599,7 @@ if [ "$installibreoffice" = "y" ]; then
 		$SUDO apt-get $APTVERBOSITY install libreoffice
 		OOOEXE="/usr/lib/libreoffice/program/soffice.bin"
 	else
-		cd /tmp/alfrescoinstall
+		cd $TMPFOLDER
 		curl -# -L -O $LIBREOFFICE
 		tar xf LibreOffice*.tar.gz
 		cd "$(find . -type d -name "LibreOffice*")"
@@ -662,7 +663,7 @@ read -e -p "Install Swftools${ques} [y/n] " -i "y" installswftools
 if [ "$installswftools" = "y" ]; then
   echoblue "Installing build tools and libraries needed to compile swftools. Fetching packages..."
   $SUDO apt-get $APTVERBOSITY install make build-essential ccache g++ libgif-dev libjpeg62-dev libfreetype6-dev libpng12-dev libt1-dev
-  cd /tmp/alfrescoinstall
+  cd $TMPFOLDER
   echo "Downloading swftools..."
   curl -# -O $SWFTOOLS
   tar xf swftools*.tar.gz
@@ -780,17 +781,17 @@ read -e -p "Add Alfresco war files${ques} [y/n] " -i "y" installwar
 if [ "$installwar" = "y" ]; then
 
   # Make extract dir
-  mkdir -p /tmp/alfrescoinstall/war
-  cd /tmp/alfrescoinstall/war
+  mkdir -p $TMPFOLDER/war
+  cd $TMPFOLDER/war
 
   $SUDO apt-get $APTVERBOSITY install unzip
   echo "Downloading war files..."
-  curl -# -o /tmp/alfrescoinstall/war/alfwar.zip $ALFWARZIP
+  curl -# -o $TMPFOLDER/war/alfwar.zip $ALFWARZIP
   unzip -q -j alfwar.zip
-  $SUDO cp /tmp/alfrescoinstall/war/*.war $ALF_HOME/addons/war/
-  $SUDO rm -rf /tmp/alfrescoinstall/war
+  $SUDO cp $TMPFOLDER/war/*.war $ALF_HOME/addons/war/
+  $SUDO rm -rf $TMPFOLDER/war
 
-  cd /tmp/alfrescoinstall
+  cd $TMPFOLDER
   read -e -p "Add Google docs integration${ques} [y/n] " -i "y" installgoogledocs
   if [ "$installgoogledocs" = "y" ]; then
   	echo "Downloading Google docs addon..."
@@ -844,17 +845,17 @@ if [ "$installsolr" = "y" ]; then
 
   $SUDO mv $ALF_HOME/solr/workspace-SpacesStore/conf/solrcore.properties $ALF_HOME/solr/workspace-SpacesStore/conf/solrcore.properties.orig
   $SUDO mv $ALF_HOME/solr/archive-SpacesStore/conf/solrcore.properties $ALF_HOME/solr/archive-SpacesStore/conf/solrcore.properties.orig
-  sed "s/@@ALFRESCO_SOLR_DIR@@/$SOLRDATAPATH/g" $ALF_HOME/solr/workspace-SpacesStore/conf/solrcore.properties.orig > /tmp/alfrescoinstall/solrcore.properties
-  $SUDO mv /tmp/alfrescoinstall/solrcore.properties $ALF_HOME/solr/workspace-SpacesStore/conf/solrcore.properties
-  sed "s/@@ALFRESCO_SOLR_DIR@@/$SOLRDATAPATH/g" $ALF_HOME/solr/archive-SpacesStore/conf/solrcore.properties.orig > /tmp/alfrescoinstall/solrcore.properties
-  $SUDO mv /tmp/alfrescoinstall/solrcore.properties $ALF_HOME/solr/archive-SpacesStore/conf/solrcore.properties
+  sed "s/@@ALFRESCO_SOLR_DIR@@/$SOLRDATAPATH/g" $ALF_HOME/solr/workspace-SpacesStore/conf/solrcore.properties.orig > $TMPFOLDER/solrcore.properties
+  $SUDO mv $TMPFOLDER/solrcore.properties $ALF_HOME/solr/workspace-SpacesStore/conf/solrcore.properties
+  sed "s/@@ALFRESCO_SOLR_DIR@@/$SOLRDATAPATH/g" $ALF_HOME/solr/archive-SpacesStore/conf/solrcore.properties.orig > $TMPFOLDER/solrcore.properties
+  $SUDO mv $TMPFOLDER/solrcore.properties $ALF_HOME/solr/archive-SpacesStore/conf/solrcore.properties
   SOLRDATAPATH="$ALF_HOME/solr"
 
-  echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" > /tmp/alfrescoinstall/solr.xml
-  echo "<Context docBase=\"$ALF_HOME/solr/apache-solr-1.4.1.war\" debug=\"0\" crossContext=\"true\">" >> /tmp/alfrescoinstall/solr.xml
-  echo "  <Environment name=\"solr/home\" type=\"java.lang.String\" value=\"$ALF_HOME/solr\" override=\"true\"/>" >> /tmp/alfrescoinstall/solr.xml
-  echo "</Context>" >> /tmp/alfrescoinstall/solr.xml
-  $SUDO mv /tmp/alfrescoinstall/solr.xml $CATALINA_CONF/Catalina/localhost/solr.xml
+  echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" > $TMPFOLDER/solr.xml
+  echo "<Context docBase=\"$ALF_HOME/solr/apache-solr-1.4.1.war\" debug=\"0\" crossContext=\"true\">" >> $TMPFOLDER/solr.xml
+  echo "  <Environment name=\"solr/home\" type=\"java.lang.String\" value=\"$ALF_HOME/solr\" override=\"true\"/>" >> $TMPFOLDER/solr.xml
+  echo "</Context>" >> $TMPFOLDER/solr.xml
+  $SUDO mv $TMPFOLDER/solr.xml $CATALINA_CONF/Catalina/localhost/solr.xml
 
   # Remove some unused stuff
   $SUDO rm $ALF_HOME/solr/solr.zip
