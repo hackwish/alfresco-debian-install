@@ -3,14 +3,15 @@
 # Script for install of Alfresco
 #
 # This script is a fork of the original script : https://github.com/loftuxab/alfresco-ubuntu-install
-# Copyright 2013-2014 Loftux AB, Peter Löfgren
+# Copyright 2013-2014 ADN SYSTEMES / Dixinfor, Yannick Molinet
 # Distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License (CC BY-SA 3.0)
 # -------
+
 
 export BASE_DOWNLOAD=https://raw.githubusercontent.com/dixinfor/alfresco-debian-install/master
 export INC_DOWNLOAD=$BASE_DOWNLOAD/include
 
-declare -a DEPENDENCIES=(alfresco.inc.sh apt.inc.sh cas.inc.sh check_external_files.inc.sh glusterfs.inc.sh imagemagick.inc.sh install_utilities.inc.sh libreoffice.inc.sh nginx.inc.sh openjdk.inc.sh postgresql.inc.sh swftools.inc.sh tomcat.inc.sh waitfornetwork.inc.sh)
+declare -a DEPENDENCIES=(alfresco.inc.sh apt.inc.sh cas.inc.sh check_external_files.inc.sh glusterfs.inc.sh imagemagick.inc.sh install_utilities.inc.sh java.inc.sh libreoffice.inc.sh mysql.inc.sh nginx.inc.sh postgresql.inc.sh swftools.inc.sh tomcat.inc.sh waitfornetwork.inc.sh)
 
 export KEYSTOREBASE=http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/keystore
 
@@ -98,6 +99,7 @@ echo "Adding locale support"
 
 for LOCALE in ${LOCALSUPPORT[@]}
 do
+	echogreen "Adding $LOCALE support"
 	$SUDO locale-gen $LOCALE
 done
 	
@@ -164,6 +166,7 @@ if [ "$usepack" = "y" ]; then
 	export CATALINA_CONF=/etc/tomcat7
 	export CATALINA_PID=/var/run/tomcat7.pid
 	export ALF_USER=tomcat7
+	export ALF_GROUP=tomcat7
 	declare -a REMOTEFILES=($SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP $JASIG_DOWNLOAD)
 else
 	# export ALF_HOME=/opt/alfresco
@@ -172,6 +175,7 @@ else
 	export CATALINA_CONF=$ALF_HOME/tomcat/conf
 	export CATALINA_PID=$ALF_HOME/tomcat.pid
 	export ALF_USER=alfresco
+	export ALF_GROUP=alfresco
 	declare -a REMOTEFILES=($TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP $JASIG_DOWNLOAD)
 fi
 
@@ -183,8 +187,11 @@ UpdateAPTSource
 
 # Install
 InstallUtilities
+
+# Remote Alfresco Services
 AskForGlusterFSServer
- 
+AskForPostgresqlServer
+AskForMysqlServer 
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -220,13 +227,15 @@ AskForTomcat
 AskForNginx
 
 AskForOpenJDK
+
 AskForLibreOffice
 AskForImageMagick
 AskForSwfTools
 InstallAlfresco
 
-AskForPostgresql
 AskForCAS
+
+$SUDO chown -R $ALF_USER:$ALF_GROUP $CATALINA_HOME
 
 echo
 echogreen "- - - - - - - - - - - - - - - - -"

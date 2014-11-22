@@ -3,10 +3,11 @@
 # Script for install of Alfresco
 #
 # This script is a fork of the original script : https://github.com/loftuxab/alfresco-ubuntu-install
-# Updated by ADN SYSTEMES / DIXINFOR, Yannick Molinet
-# Copyright 2013-2014 Loftux AB, Peter Löfgren
+# Copyright 2013-2014 ADN SYSTEMES / Dixinfor, Yannick Molinet
 # Distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License (CC BY-SA 3.0)
 # -------
+
+
 
 WaitForNetwork()
 {

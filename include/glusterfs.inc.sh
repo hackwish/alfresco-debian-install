@@ -3,10 +3,10 @@
 # Script for install of Alfresco
 #
 # This script is a fork of the original script : https://github.com/loftuxab/alfresco-ubuntu-install
-# Updated by ADN SYSTEMES / DIXINFOR, Yannick Molinet
-# Copyright 2013-2014 Loftux AB, Peter Löfgren
+# Copyright 2013-2014 ADN SYSTEMES / Dixinfor, Yannick Molinet
 # Distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License (CC BY-SA 3.0)
 # -------
+
 
 function AskForGlusterFSServer() {
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
@@ -24,6 +24,7 @@ function AskForGlusterFSServer() {
 		InstallGlusterFSServer
 	fi
 }
+
 function InstallGlusterFSServer() {
 	server=()
 	echo
@@ -127,6 +128,10 @@ function InstallGlusterFSServer() {
 			$TMPFOLDER/remote-glusterfs-slave.sh
 		fi
 	done
+	
+	echo
+	echogreen "Finished installing Remote GlusterFS Server..."
+	echo
 }
 
 function AskForMountGlusterFS() {
@@ -136,7 +141,7 @@ function AskForMountGlusterFS() {
 	echo " This part don't install any remote service. You must have a valid GlusterFS server available with correct permissions set"
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
 	echo
-	read -e -p "Do you want to mount alf_data on remote GlusterFS ? [y/n]" -i "n" mount
+	read -e -p "Do you want to mount alf_data on remote GlusterFS ? [y/n] " -i "n" mount
 	if [ "$mount" = "y" ]; then
 		MountGlusterFS
 	fi
@@ -150,13 +155,18 @@ function MountGlusterFS (){
 		examplevol="$GLUSTERVOLUME"
 	fi
 		
-	read -e -p "Specify Hostname or IP Address of a GlusterFS Server (ex. $examplehost): " gfshost
+	read -e -p "Specify Hostname or IP Address of a GlusterFS Server (ex. $examplehost): " -i "$examplehost" gfshost
 	WaitForNetwork $gfshost
-	read -e -p "Specify GlusterFS Volume Name (ex. $examplevol): " gfsvol
+	read -e -p "Specify GlusterFS Volume Name (ex. $examplevol): " -i "$examplevol" gfsvol
 	gfspath="$gfshost:$gfsvol"
 	
+	echoblue "Fetching package ..."
 	$SUDO apt-get $APTVERBOSITY install glusterfs-client
 	mkdir -p $ALF_HOME/alf_data
 	mount -t glusterfs $gfspath $ALF_HOME/alf_data
 	echo "$gfspath  $ALF_HOME/alf_data    glusterfs       defaults,_netdev        0       0" >> /etc/fstab
+	
+	echo
+	echogreen "Remote GlusterFS Volume is mounted"
+	echo
 }

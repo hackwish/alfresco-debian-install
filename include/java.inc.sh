@@ -3,8 +3,7 @@
 # Script for install of Alfresco
 #
 # This script is a fork of the original script : https://github.com/loftuxab/alfresco-ubuntu-install
-# Updated by ADN SYSTEMES / DIXINFOR, Yannick Molinet
-# Copyright 2013-2014 Loftux AB, Peter Löfgren
+# Copyright 2013-2014 ADN SYSTEMES / Dixinfor, Yannick Molinet
 # Distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License (CC BY-SA 3.0)
 # -------
 
@@ -35,3 +34,28 @@ function InstallOpenJDK() {
 	echogreen "Finished installing OpenJDK"
 	echo
 }
+
+function AskForJBDC() {
+	echo
+	if [ "$installpsql" = "y" ]; then
+		echoblue "You have installed a Postgresql Server, so you need the correct JBDC Connector !"
+		InstallPostgresqlJBDC
+	else
+		if [ "$installmysql" = "y" ]; then
+			echoblue "You have installed a Mysql Server, so you need the correct JBDC Connector !"
+			InstallMysqlJBDC
+		else
+			read -e -p "Install Postgres JDBC Connector${ques} [y/n] " -i "y" installpg
+			if [ "$installpg" = "y" ]; then
+				InstallPostgresqlJBDC
+			else
+				echo
+				read -e -p "Install Mysql JDBC Connector${ques} [y/n] " -i "n" installmy
+				if [ "$installmy" = "y" ]; then
+					InstallMysqlJBDC
+				fi
+			fi
+		fi
+	fi
+}
+

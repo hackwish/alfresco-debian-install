@@ -3,10 +3,10 @@
 # Script for install of Alfresco
 #
 # This script is a fork of the original script : https://github.com/loftuxab/alfresco-ubuntu-install
-# Updated by ADN SYSTEMES / DIXINFOR, Yannick Molinet
-# Copyright 2013-2014 Loftux AB, Peter Löfgren
+# Copyright 2013-2014 ADN SYSTEMES / Dixinfor, Yannick Molinet
 # Distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License (CC BY-SA 3.0)
 # -------
+
 
 function AskForTomcat(){
 	echo
@@ -108,32 +108,6 @@ function InstallTomcat() {
 		$SUDO mv $SHARE_CONFIG_CUSTOM $CATALINA_BASE/shared/classes/alfresco/web-extension/
 	fi
 
-	echo
-	read -e -p "Install Postgres JDBC Connector${ques} [y/n] " -i "y" installpg
-	if [ "$installpg" = "y" ]; then
-		if [ "$usepack" = "y" ]; then
-			$SUDO apt-get $APTVERBOSITY install libpostgresql-jdbc-java
-			ln -s /usr/share/java/postgresql.jar /usr/share/tomcat7/lib/postgresql.jar
-		else
-			curl -# -O $JDBCPOSTGRESURL/$JDBCPOSTGRES
-			$SUDO mv $JDBCPOSTGRES $CATALINA_HOME/lib
-		fi
-	else
-		echo
-		read -e -p "Install Mysql JDBC Connector${ques} [y/n] " -i "n" installmy
-		if [ "$installmy" = "y" ]; then
-			if [ "$usepack" = "y" ]; then
-				$SUDO apt-get $APTVERBOSITY install libmysql-java
-			else
-				cd $TMPFOLDER
-				curl -# -L -O $JDBCMYSQLURL/$JDBCMYSQL
-				tar xf $JDBCMYSQL
-				cd "$(find . -type d -name "mysql-connector*")"
-				$SUDO mv mysql-connector*.jar $CATALINA_HOME/lib
-			fi
-		fi
-		$SUDO chown -R $ALF_USER:$ALF_USER $CATALINA_HOME
-	fi
 	echo
 	echogreen "Finished installing Tomcat"
 	echo
