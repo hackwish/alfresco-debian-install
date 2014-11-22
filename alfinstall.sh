@@ -127,6 +127,10 @@ else
 fi
 
 # Retrieve Dependancy and source it
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo "Check and download dependencies."
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+		
 cd $INCLUDEFOLDER
 URLERROR=0
 
@@ -140,8 +144,10 @@ for DEPENDENCY in ${DEPENDENCIES[@]}
 			echored "In alfinstall.sh, please fix this URL: $FILE"
 			URLERROR=1
 		else
+			echo "Downloading $DEPENDENCY ..."
 			$SUDO curl -# -o $INCLUDEFOLDER/$DEPENDENCY $FILE
 			. $INCLUDEFOLDER/$DEPENDENCY
+			echogreen "$DEPENDENCY downloaded !"
 		fi
 	done
 
