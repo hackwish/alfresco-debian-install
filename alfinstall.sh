@@ -86,11 +86,9 @@ mkdir -p $INCLUDEFOLDER
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echogreen "Alfresco Ubuntu/Debian installer by ADN SYSTEMES / Dixinfor."
-echogreen "Based on 
+echogreen "Based on the original script from LoftuxAB (https://github.com/loftuxab/alfresco-ubuntu-install) "
 echogreen "with more deb package, manage sudo capacities, and installed some services remotly"
-echogreen "Please read the documentation at"
-echogreen "Original: https://github.com/loftuxab/alfresco-ubuntu-install"
-echogreen "Fork : https://github.com/dixinfor/alfresco-debian-install"
+echogreen "Please read the documentation at https://github.com/dixinfor/alfresco-debian-install"
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo
 
