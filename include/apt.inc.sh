@@ -90,4 +90,19 @@ function InstallUtilities() {
 		echo "expect already installed ..."
 		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	fi
+	
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo "unzip is used to uncompress some files."
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	if [ "`which unzip`" = "" ]; then
+		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+		echo "You need to install unzip."
+		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+		apt-get $APTVERBOSITY install unzip
+	else
+		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+		echo "unzip already installed ..."
+		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	fi
+
 }

@@ -30,9 +30,6 @@ function AskForLibreOffice() {
 			$SUDO dpkg -i *.deb
 			OOOEXE="/opt/libreoffice4.2/program/soffice.bin"
 		fi
-		echoblue "Update alfresco-global.properties"
-		sed -i.bak -e "s;ooo.exe=.*;ooo.exe=$OOOEXE;g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		echo
 		
 		echo
 		echoblue "Installing some support fonts for better transformations."

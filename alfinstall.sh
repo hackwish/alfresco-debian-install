@@ -38,14 +38,26 @@ export SWFTOOLS=http://www.swftools.org/swftools-2013-04-09-1007.tar.gz
 # export SOLR=https://artifacts.alfresco.com/nexus/content/groups/public/org/alfresco/alfresco-solr/5.0.b/alfresco-solr-5.0.b-config.zip
 # export SOLRWAR=https://artifacts.alfresco.com/nexus/content/groups/public/org/alfresco/alfresco-solr/5.0.b/alfresco-solr-5.0.b.war
 # export SPP=https://artifacts.alfresco.com/nexus/content/groups/public/org/alfresco/alfresco-spp/5.0.b/alfresco-spp-5.0.b.amp
+# export ALFREPOWAR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco/5.0.b/alfresco-5.0.b.war
+# export ALFSHAREWAR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/share/5.0.b/share-5.0.b.war
+# export GOOGLEDOCSREPO=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/integrations/alfresco-googledocs-repo/2.0.8/alfresco-googledocs-repo-2.0.8.amp
+# export GOOGLEDOCSSHARE=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/integrations/alfresco-googledocs-share/2.0.8/alfresco-googledocs-share-2.0.8.amp
+# export SPP=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-spp/5.0.b/alfresco-spp-5.0.b.amp
+# export SOLRCONFIG=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr4/5.0.b/alfresco-solr4-5.0.b-config-ssl.zip
+# export SOLRWAR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr4/5.0.b/alfresco-solr4-5.0.b-ssl.war
 
-export ALFWARZIP=http://dl.alfresco.com/release/community/5.0.a-build-00023/alfresco-community-5.0.a.zip
-export GOOGLEDOCSREPO=http://dl.alfresco.com/release/community/5.0.a-build-00023/alfresco-googledocs-repo-2.0.7.amp
-export GOOGLEDOCSSHARE=http://dl.alfresco.com/release/community/5.0.a-build-00023/alfresco-googledocs-share-2.0.7.amp
-export SOLR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr/5.0.a/alfresco-solr-5.0.a-config.zip
-export SOLRWAR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr/5.0.a/alfresco-solr-5.0.a.war
-export SPP=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-spp/5.0.a/alfresco-spp-5.0.a.amp
+ALFRESCOVERSION="5.0.a"
+GOOGLEDOCSVERSION="2.0.7"
 
+export ALFREPOWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco/$ALFRESCO_VERSION/alfresco-ALFRESCO_VERSION.war"
+export ALFSHAREWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/share/$ALFRESCO_VERSION/share-$ALFRESCO_VERSION.war"
+export SPP="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-spp/$ALFRESCO_VERSION/alfresco-spp-$ALFRESCO_VERSION.amp"
+
+export GOOGLEDOCSREPO="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/integrations/alfresco-googledocs-repo/$GOOGLEDOCSVERSION/alfresco-googledocs-repo-$GOOGLEDOCSVERSION.amp"
+export GOOGLEDOCSSHARE="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/integrations/alfresco-googledocs-share/$GOOGLEDOCSVERSION/alfresco-googledocs-share-$GOOGLEDOCSVERSION.amp"
+
+export SOLRCONFIG=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr/$ALFRESCO_VERSION/alfresco-solr-$ALFRESCO_VERSION-config.zip
+export SOLRWAR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr/$ALFRESCO_VERSION/alfresco-solr-$ALFRESCO_VERSION.war
 
 export APTVERBOSITY="-qq -y"
 
@@ -173,7 +185,7 @@ if [ "$usepack" = "y" ]; then
 	export CATALINA_PID=/var/run/tomcat7.pid
 	export ALF_USER=tomcat7
 	export ALF_GROUP=tomcat7
-	declare -a REMOTEFILES=($SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP $CAS_DOWNLOAD)
+	declare -a REMOTEFILES=($SWFTOOLS $ALFREPOWAR $ALFSHAREWAR $SPP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLRCONFIG $SOLRWAR $CAS_DOWNLOAD)
 else
 	# export ALF_HOME=/opt/alfresco
 	export CATALINA_HOME=$ALF_HOME/tomcat
@@ -182,7 +194,7 @@ else
 	export CATALINA_PID=$ALF_HOME/tomcat.pid
 	export ALF_USER=alfresco
 	export ALF_GROUP=alfresco
-	declare -a REMOTEFILES=($TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP $CAS_DOWNLOAD)
+	declare -a REMOTEFILES=($TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL $LIBREOFFICE $SWFTOOLS $ALFREPOWAR $ALFSHAREWAR $SPP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLRCONFIG $SOLRWAR $CAS_DOWNLOAD)
 fi
 
 # Check if remote files are available
@@ -240,7 +252,7 @@ AskForImageMagick
 AskForSwfTools
 InstallAlfresco
 
-UpdateAlfresoGlobalProperties
+UpdateAlfrescoGlobalProperties
 AskForCAS
 
 

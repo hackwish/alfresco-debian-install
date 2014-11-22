@@ -62,12 +62,19 @@ function InstallAlfresco() {
 	  mkdir -p $TMPFOLDER/war
 	  cd $TMPFOLDER/war
 
-	  $SUDO apt-get $APTVERBOSITY install unzip
-	  echo "Downloading war files..."
-	  curl -# -o $TMPFOLDER/war/alfwar.zip $ALFWARZIP
-	  unzip -q -j alfwar.zip
-	  $SUDO cp $TMPFOLDER/war/*.war $ALF_HOME/addons/war/
-	  $SUDO rm -rf $TMPFOLDER/war
+	if [ "`which unzip`" = "" ]; then
+		$SUDO apt-get $APTVERBOSITY install unzip
+	fi
+	
+	echogreen "Downloading alfresco and share war files..."
+	$SUDO curl -# -o $ALF_HOME/addons/war/alfresco.war $ALFREPOWAR
+	$SUDO curl -# -o $ALF_HOME/addons/war/share.war $ALFSHAREWAR
+
+  
+	# $SUDO curl -# -o $TMPFOLDER/war/alfwar.zip $ALFWARZIP
+	# unzip -q -j alfwar.zip
+	# $SUDO cp $TMPFOLDER/war/*.war $ALF_HOME/addons/war/
+	# $SUDO rm -rf $TMPFOLDER/war
 
 	  cd $TMPFOLDER
 	  read -e -p "Add Google docs integration${ques} [y/n] " -i "y" installgoogledocs
@@ -110,7 +117,7 @@ function InstallAlfresco() {
 
 	  $SUDO mkdir -p $ALF_HOME/solr
 	  $SUDO mkdir -p $CATALINA_CONF/Catalina/localhost
-	  $SUDO curl -# -o $ALF_HOME/solr/solr.zip $SOLR
+	  $SUDO curl -# -o $ALF_HOME/solr/solr.zip $SOLRCONFIG
 	  $SUDO curl -# -o $ALF_HOME/solr/apache-solr-1.4.1.war $SOLRWAR
 	  $SUDO curl -# -o $CATALINA_CONF/tomcat-users.xml $BASE_DOWNLOAD/tomcat-alfresco/tomcat-users.xml
 	  cd $ALF_HOME/solr/
@@ -211,6 +218,10 @@ function UpdateAlfrescoGlobalProperties() {
 		fi
 	else
 		echored "FTP Server disabled !"
+	fi
+
+	if [ "$installibreoffice" = "y" ]; then
+		sed -i.bak -e "s;ooo.exe=.*;ooo.exe=$OOOEXE;g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	fi
 
 }

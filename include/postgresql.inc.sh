@@ -16,7 +16,7 @@ function AskForPostgresqlServer() {
 
 	read -e -p "Do you want install PostgreSQL Server${ques} [y/n] " -i "y" installpsql
 	if [ "$installpsql" = "y" ]; then
-		read -e -p "Where (127.0.0.1 for local installation) ?" -i "127.0.0.1" psqlserver
+		read -e -p "Where (127.0.0.1 for local installation)? " -i "127.0.0.1" psqlserver
 		read -e -p "Root password for $psqlserver ?" psqlroot
 		read -e -p "Network interface to accessing to psql server (eth0) ?" -i "eth0" psqliface
 		read -e -p "Create Alfresco User ? [y/n] " -i "y" createuser
