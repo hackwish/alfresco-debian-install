@@ -25,6 +25,10 @@ function AskForPostgresql() {
 			read -e -p "Create Alfresco Database ? [y/n] " -i "y" createdb
 			read -e -p "Set password for postgresql admin account ? [y/n]" -i "n"  setadminpwd
 
+			if [ "$psqlserver" != "127.0.0.1" ]; then
+				WaitForNetwork $psqlserver
+			fi
+			
 			sed -i.bak -e "s/createdb=y/createdb=$createdb/g" $ALF_HOME/scripts/postgresql.sh
 			sed -i.bak -e "s/createuser=y/createuser=$createuser/g"  $ALF_HOME/scripts/postgresql.sh
 			sed -i.bak -e "s/setadminpwd=y/setadminpwd=$setadminpwd/g" $ALF_HOME/scripts/postgresql.sh

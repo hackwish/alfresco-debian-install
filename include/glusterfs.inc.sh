@@ -30,6 +30,7 @@ function InstallGlusterFSServer() {
 	read -e -p "How many remote server to install in the GlusterFS Cluster${ques} [1] " -i "1" glustercount
 	for (( i = 0 ; i < $glustercount ; i++ )) do
 		read -e -p "Enter the Peer's IP:" peerip
+		WaitForNetwork $peerip
 		server+=($peerip)
 	done
 		
@@ -116,10 +117,12 @@ function InstallGlusterFSServer() {
 		if [[ $i -eq 1 ]]
 		then
 			echogreen "Execute GlusterFS Server Installation Script on 'Master' Server: ${server[$i-1]}"
+			WaitForNetwork ${server[$i-1]}
 			sed -i.bak -e "s/set remoteip.*/set remoteip ${server[$i-1]}/g" $TMPFOLDER/remote-glusterfs-master.sh
 			$TMPFOLDER/remote-glusterfs-master.sh
 		else
 			echogreen "Execute GlusterFS Server Installation Script on 'Slave' Server: ${server[$i-1]}"
+			WaitForNetwork ${server[$i-1]}
 			sed -i.bak -e "s/set remoteip.*/set remoteip ${server[$i-1]}/g" $TMPFOLDER/remote-glusterfs-slave.sh
 			$TMPFOLDER/remote-glusterfs-slave.sh
 		fi
@@ -139,12 +142,19 @@ function AskForMountGlusterFS() {
 	fi
 }
 function MountGlusterFS (){
-	example="GFS-SRV01:gfsvol"
+	examplehost="GFS-SRV01"
+	examplevol="gfsvol"
+	
 	if [ "$glusterfsserver" = "y" ]; then
-		example="${server[0]}:$GLUSTERVOLUME"
+		examplehost="${server[0]}"
+		examplevol="$GLUSTERVOLUME"
 	fi
 		
-	read -e -p "Specify remote GlusterFS path (ex. $example):" gfspath
+	read -e -p "Specify Hostname or IP Address of a GlusterFS Server (ex. $examplehost): " gfshost
+	WaitForNetwork $gfshost
+	read -e -p "Specify GlusterFS Volume Name (ex. $examplevol): " gfsvol
+	gfspath="$gfshost:$gfsvol"
+	
 	$SUDO apt-get $APTVERBOSITY install glusterfs-client
 	mkdir -p $ALF_HOME/alf_data
 	mount -t glusterfs $gfspath $ALF_HOME/alf_data
