@@ -10,7 +10,7 @@
 export BASE_DOWNLOAD=https://raw.githubusercontent.com/dixinfor/alfresco-debian-install/master
 export INC_DOWNLOAD=$BASE_DOWNLOAD/include
 
-declare -a DEPENDENCIES=(alfresco.inc.sh apt.inc.sh cas.inc.sh check_remote_files.inc.sh glusterfs.inc.sh imagemagick.inc.sh install_utilities.inc.sh libreoffice.inc.sh nginx.inc.sh openjdk.inc.sh postgresql.inc.sh swftools.inc.sh tomcat.inc.sh waitfornetwork.inc.sh)
+declare -a DEPENDENCIES=(alfresco.inc.sh apt.inc.sh cas.inc.sh check_external_files.inc.sh glusterfs.inc.sh imagemagick.inc.sh install_utilities.inc.sh libreoffice.inc.sh nginx.inc.sh openjdk.inc.sh postgresql.inc.sh swftools.inc.sh tomcat.inc.sh waitfornetwork.inc.sh)
 
 export KEYSTOREBASE=http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/keystore
 
@@ -86,6 +86,7 @@ mkdir -p $INCLUDEFOLDER
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echogreen "Alfresco Ubuntu/Debian installer by ADN SYSTEMES / Dixinfor."
+echogreen "Based on 
 echogreen "with more deb package, manage sudo capacities, and installed some services remotly"
 echogreen "Please read the documentation at"
 echogreen "Original: https://github.com/loftuxab/alfresco-ubuntu-install"
