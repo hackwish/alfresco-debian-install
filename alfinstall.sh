@@ -23,7 +23,7 @@ export JDBCPOSTGRESURL=http://jdbc.postgresql.org/download
 export JDBCPOSTGRES=postgresql-9.3-1102.jdbc41.jar
 export JDBCMYSQLURL=http://cdn.mysql.com/Downloads/Connector-J
 export JDBCMYSQL=mysql-connector-java-5.1.32.tar.gz
-export JASIG_DOWNLOAD=http://downloads.jasig.org/cas/cas-server-4.0.0-release.tar.gz
+export CAS_DOWNLOAD=http://downloads.jasig.org/cas/cas-server-4.0.0-release.tar.gz
 
 export LIBREOFFICE=http://download.documentfoundation.org/libreoffice/stable/4.2.6/deb/x86_64/LibreOffice_4.2.6-secfix_Linux_x86-64_deb.tar.gz
 
@@ -72,6 +72,16 @@ echogreen () {
   echo "${bldgre}$1${txtrst}"
 }
 
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echogreen "Alfresco Ubuntu/Debian installer by ADN SYSTEMES / Dixinfor."
+echogreen "Based on the original script from LoftuxAB (https://github.com/loftuxab/alfresco-ubuntu-install) "
+echogreen "with more deb package, manage sudo capacities, and installed some services remotly"
+echogreen "Please read the documentation at https://github.com/dixinfor/alfresco-debian-install"
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo
+
+
 echogreen "Cleanup Alfresco Install Temp Folder"
 TMPFOLDER="/tmp/alfinstall"
 INCLUDEFOLDER="$TMPFOLDER/include"
@@ -85,16 +95,7 @@ cd $TMPFOLDER
 mkdir -p $INCLUDEFOLDER
 
 echo
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echogreen "Alfresco Ubuntu/Debian installer by ADN SYSTEMES / Dixinfor."
-echogreen "Based on the original script from LoftuxAB (https://github.com/loftuxab/alfresco-ubuntu-install) "
-echogreen "with more deb package, manage sudo capacities, and installed some services remotly"
-echogreen "Please read the documentation at https://github.com/dixinfor/alfresco-debian-install"
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echo
-
-echo
-echo "Adding locale support"
+echogreen "Adding locale support"
 #install locale to support that locale date formats in open office transformations
 
 for LOCALE in ${LOCALSUPPORT[@]}
@@ -116,10 +117,9 @@ if [ "$usepack" = "y" ]; then
 		echo "You need to install sudo."
 		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 		apt-get $APTVERBOSITY install sudo;
+		echogreen "sudo installed ..."
 	else
-		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-		echo "sudo detected ..."
-		echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+		echogreen "sudo detected ..."
 	fi
 	SUDO=`sudo`
 else
@@ -167,7 +167,7 @@ if [ "$usepack" = "y" ]; then
 	export CATALINA_PID=/var/run/tomcat7.pid
 	export ALF_USER=tomcat7
 	export ALF_GROUP=tomcat7
-	declare -a REMOTEFILES=($SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP $JASIG_DOWNLOAD)
+	declare -a REMOTEFILES=($SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP $CAS_DOWNLOAD)
 else
 	# export ALF_HOME=/opt/alfresco
 	export CATALINA_HOME=$ALF_HOME/tomcat
@@ -176,7 +176,7 @@ else
 	export CATALINA_PID=$ALF_HOME/tomcat.pid
 	export ALF_USER=alfresco
 	export ALF_GROUP=alfresco
-	declare -a REMOTEFILES=($TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP $JASIG_DOWNLOAD)
+	declare -a REMOTEFILES=($TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR $SPP $CAS_DOWNLOAD)
 fi
 
 # Check if remote files are available
