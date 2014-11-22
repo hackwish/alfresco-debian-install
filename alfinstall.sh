@@ -49,15 +49,15 @@ export SWFTOOLS=http://www.swftools.org/swftools-2013-04-09-1007.tar.gz
 ALFRESCOVERSION="5.0.a"
 GOOGLEDOCSVERSION="2.0.7"
 
-export ALFREPOWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco/$ALFRESCO_VERSION/alfresco-ALFRESCO_VERSION.war"
-export ALFSHAREWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/share/$ALFRESCO_VERSION/share-$ALFRESCO_VERSION.war"
-export SPP="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-spp/$ALFRESCO_VERSION/alfresco-spp-$ALFRESCO_VERSION.amp"
+export ALFREPOWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco/$ALFRESCOVERSION/alfresco-$ALFRESCOVERSION.war"
+export ALFSHAREWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/share/$ALFRESCOVERSION/share-$ALFRESCOVERSION.war"
+export SPP="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-spp/$ALFRESCOVERSION/alfresco-spp-$ALFRESCOVERSION.amp"
 
 export GOOGLEDOCSREPO="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/integrations/alfresco-googledocs-repo/$GOOGLEDOCSVERSION/alfresco-googledocs-repo-$GOOGLEDOCSVERSION.amp"
 export GOOGLEDOCSSHARE="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/integrations/alfresco-googledocs-share/$GOOGLEDOCSVERSION/alfresco-googledocs-share-$GOOGLEDOCSVERSION.amp"
 
-export SOLRCONFIG=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr/$ALFRESCO_VERSION/alfresco-solr-$ALFRESCO_VERSION-config.zip
-export SOLRWAR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr/$ALFRESCO_VERSION/alfresco-solr-$ALFRESCO_VERSION.war
+export SOLRCONFIG="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr/$ALFRESCOVERSION/alfresco-solr-$ALFRESCOVERSION-config.zip"
+export SOLRWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr/$ALFRESCOVERSION/alfresco-solr-$ALFRESCOVERSION.war"
 
 export APTVERBOSITY="-qq -y"
 
