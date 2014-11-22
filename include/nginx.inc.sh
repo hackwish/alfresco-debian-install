@@ -28,33 +28,35 @@ function AskForNginx() {
 }
 
 function InstallNginx() {
-echoblue "Installing nginx. Fetching packages..."
-	  echo
-	$SUDO -s << EOF
-	  echo "deb http://nginx.org/packages/mainline/ubuntu $(lsb_release -cs) nginx" >> /etc/apt/sources.list
-	  $SUDO curl -# -o $TMPFOLDER/nginx_signing.key http://nginx.org/keys/nginx_signing.key
-	  apt-key add $TMPFOLDER/nginx_signing.key
-	  #echo "deb http://ppa.launchpad.net/nginx/stable/ubuntu $(lsb_release -cs) main" >> /etc/apt/sources.list
-	  #apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C300EE8C
-	  # Alternate with spdy support and more, change  apt install -> nginx-custom
-	  #echo "deb http://ppa.launchpad.net/brianmercer/nginx/ubuntu $(lsb_release -cs) main" >> /etc/apt/sources.list
-	  #apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8D0DC64F
-	EOF
-	  $SUDO apt-get $APTVERBOSITY update && $SUDO apt-get $APTVERBOSITY install nginx
-	  $SUDO mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
-	  $SUDO curl -# -o /etc/nginx/nginx.conf $BASE_DOWNLOAD/nginx/nginx.conf
-	  $SUDO mkdir -p /var/cache/nginx/alfresco
-	  $SUDO mkdir -p $ALF_HOME/www
-	  if [ ! -f "$ALF_HOME/www/maintenance.html" ]; then
+	echoblue "Installing nginx. Fetching packages..."
+	echo
+	$SUDO echo "deb http://nginx.org/packages/mainline/ubuntu $(lsb_release -cs) nginx" >> /etc/apt/sources.list
+	$SUDO curl -# -o $TMPFOLDER/nginx_signing.key http://nginx.org/keys/nginx_signing.key
+	$SUDO apt-key add $TMPFOLDER/nginx_signing.key
+	
+	#echo "deb http://ppa.launchpad.net/nginx/stable/ubuntu $(lsb_release -cs) main" >> /etc/apt/sources.list
+	#apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C300EE8C
+	# Alternate with spdy support and more, change  apt install -> nginx-custom
+	#echo "deb http://ppa.launchpad.net/brianmercer/nginx/ubuntu $(lsb_release -cs) main" >> /etc/apt/sources.list
+	#apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8D0DC64F
+	
+	$SUDO apt-get $APTVERBOSITY update && $SUDO apt-get $APTVERBOSITY install nginx
+	$SUDO mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
+	$SUDO curl -# -o /etc/nginx/nginx.conf $BASE_DOWNLOAD/nginx/nginx.conf
+	$SUDO mkdir -p /var/cache/nginx/alfresco
+	$SUDO mkdir -p $ALF_HOME/www
+	
+	if [ ! -f "$ALF_HOME/www/maintenance.html" ]; then
 		echo "Downloading maintenance html page..."
 		$SUDO curl -# -o $ALF_HOME/www/maintenance.html $BASE_DOWNLOAD/nginx/maintenance.html
-	  fi
-	  $SUDO chown -R www-data:root /var/cache/nginx/alfresco
-	  $SUDO chown -R www-data:root $ALF_HOME/www
-	  ## Reload config file
-	  $SUDO service nginx reload
+	fi
+	$SUDO chown -R www-data:root /var/cache/nginx/alfresco
+	$SUDO chown -R www-data:root $ALF_HOME/www
+	
+	## Reload config file
+	$SUDO service nginx reload
 
-	  echo
-	  echogreen "Finished installing nginx"
-	  echo
+	echo
+	echogreen "Finished installing nginx"
+	echo
 }
