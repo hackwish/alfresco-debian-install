@@ -155,38 +155,15 @@ function InstallAlfresco() {
 	   $SUDO chown -R www-data:root $ALF_HOME/www
 	fi
 
-	read -e -p "Enable Alfresco IMAP Server ${ques} [y/n] " -i "y" imap
-	if [ "$imap" = "y" ]; then
-		read -e -p "On which interface (eth0) ${ques}" -i "eth0" ifmap
-		bindimap=`ifconfig $ifmap | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
-		
-		sed -i.bak "s/#imap.server.enabled=.*/imap.server.enabled=true/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		sed -i.bak "s/#imap.server.port=.*/imap.server.port=143/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		sed -i.bak "s/#imap.server.host=.*/imap.server.host=$bindimap/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-	fi
-
+	read -e -p "Enable Alfresco IMAP Server ${ques} [y/n] " -i "y" enableimap
 	read -e -p "Keep default port for CIFS ? [y/n] " -i "y" cifsports
-	if [ "$cifsports" = "y" ]; then
-		sed -i.bak -e "s/cifs.tcpipSMB.port=1445/cifs.tcpipSMB.port=445/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		sed -i.bak -e "s/cifs.netBIOSSMB.sessionPort=1139/cifs.netBIOSSMB.sessionPort=139/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		sed -i.bak -e "s/cifs.netBIOSSMB.namePort=1137/cifs.netBIOSSMB.namePort=137/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		sed -i.bak -e "s/cifs.netBIOSSMB.datagramPort=1138/cifs.netBIOSSMB.datagramPort=1138/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-	else
-		echored "Keep CIFS ports providing by Loftuxab !";
+	read -e -p "Enable FTP Server ? [y/n] " -i "y" enableftp
+	
+	if [ "$enableftp" = "y" ]; then
+		read -e -p "Keep default port for FTP ? [y/n] " -i "y" ftpports
 	fi
 
-	read -e -p "Enable FTP Server ? [y/n] " -i "y" ftp
-	if [ "$ftp" = "y" ]; then
-		sed -i.bak -e "s/ftp.enabled=false/ftp.enabled=true/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		read -e -p "Keep default port for FTP ? [y/n] " -i "y" ftpports
-		if [ "$ftpports" = "y" ]; then
-			sed -i.bak -e "s/ftp.port=2021/ftp.port=21/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		else
-			echored "Keep ports providing by Loftusab !";
-		fi
-	else
-		echored "FTP Server disabled !"
-	fi
+	
 }
 
 function UpdateAlfrescoGlobalProperties() {
@@ -208,4 +185,32 @@ function UpdateAlfrescoGlobalProperties() {
 			
 		sed -i.bak "s/db.pool.validate.query=.*/#db.pool.validate.query=/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	fi
+	
+	if [ "$enableimap" = "y" ]; then
+		read -e -p "On which interface (eth0) ${ques}" -i "eth0" ifmap
+		bindimap=`ifconfig $ifmap | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+		
+		sed -i.bak "s/#imap.server.enabled=.*/imap.server.enabled=true/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/#imap.server.port=.*/imap.server.port=143/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/#imap.server.host=.*/imap.server.host=$bindimap/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+	fi
+
+	if [ "$cifsports" = "y" ]; then
+		sed -i.bak -e "s/cifs.tcpipSMB.port=1445/cifs.tcpipSMB.port=445/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak -e "s/cifs.netBIOSSMB.sessionPort=1139/cifs.netBIOSSMB.sessionPort=139/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak -e "s/cifs.netBIOSSMB.namePort=1137/cifs.netBIOSSMB.namePort=137/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak -e "s/cifs.netBIOSSMB.datagramPort=1138/cifs.netBIOSSMB.datagramPort=1138/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+	fi
+
+	if [ "$enableftp" = "y" ]; then
+		sed -i.bak -e "s/ftp.enabled=false/ftp.enabled=true/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		if [ "$ftpports" = "y" ]; then
+			sed -i.bak -e "s/ftp.port=2021/ftp.port=21/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		else
+			echored "Keep ports providing by Loftusab !";
+		fi
+	else
+		echored "FTP Server disabled !"
+	fi
+
 }

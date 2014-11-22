@@ -38,6 +38,12 @@ function CheckRemoteFiles (){
 }
 
 function RetrieveExecutionScripts() {
+	echo
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo "Retrieve all other scripts..."
+	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	
 	$SUDO mkdir -p $ALF_HOME/scripts
 	
 	if [ ! -f "$ALF_HOME/scripts/mariadb.sh" ]; then
@@ -87,4 +93,8 @@ function RetrieveExecutionScripts() {
 	fi
   
 	$SUDO chmod u+x $ALF_HOME/scripts/*.sh
+	
+	echo
+	echogreen "All scripts downloaded ..."
+	echo
 }

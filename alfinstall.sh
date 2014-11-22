@@ -215,7 +215,7 @@ fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echo " Define Alfresco Home Path ..."
+echo " Define Alfresco HomePath ..."
 echo " You can change (not recommanded) default Alfresco Home Path"
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo
@@ -248,7 +248,8 @@ if [ "$installpsql" = "n" ]; then
 	echo "1. Add database. Install scripts available in $ALF_HOME/scripts"
 	echored "   It is however recommended that you use a separate database server."
 fi
-echo "2. Verify Tomcat memory and locale settings in /etc/init/alfresco.conf (FOR UBUNTU)"
+echo "2. Verify Tomcat memory and locale settings in "
+echo "   /etc/init/alfresco.conf (FOR UBUNTU)"
 echo "   /etc/default/tomcat7 (FOR DEBIAN)"
 echo "   Alfresco runs best with lots of memory. Add some more to \"lots\" and you will be fine!"
 echo "   Match the locale LC_ALL (or remove) setting to the one used in this script."
