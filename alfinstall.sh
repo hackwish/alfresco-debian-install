@@ -12,7 +12,7 @@ export BASE_DOWNLOAD=https://raw.githubusercontent.com/dixinfor/alfresco-debian-
 export KEYSTOREBASE=http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/keystore
 
 #Change this to prefered locale to make sure it exists. This has impact on LibreOffice transformations
-export LOCALESUPPORT=sv_SE.utf8
+declare -a LOCALESUPPORT=(en_EN.utf8 fr_FR.utf-8)
 
 export TOMCAT_DOWNLOAD=http://apache.mirrors.spacedump.net/tomcat/tomcat-7/v7.0.57/bin/apache-tomcat-7.0.57.tar.gz
 export JDBCPOSTGRESURL=http://jdbc.postgresql.org/download
@@ -90,6 +90,16 @@ echogreen "Original: https://github.com/loftuxab/alfresco-ubuntu-install"
 echogreen "Fork : https://github.com/dixinfor/alfresco-debian-install"
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo
+
+echo
+echo "Adding locale support"
+#install locale to support that locale date formats in open office transformations
+
+for LOCALE in ${LOCALSUPPORT[@]}
+do
+	$SUDO locale-gen $LOCALE
+done
+	
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
