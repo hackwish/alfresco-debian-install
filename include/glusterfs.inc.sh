@@ -30,7 +30,7 @@ function InstallGlusterFSServer() {
 	echo
 	read -e -p "How many remote server to install in the GlusterFS Cluster${ques} [1] " -i "1" glustercount
 	for (( i = 0 ; i < $glustercount ; i++ )) do
-		read -e -p "Enter the Peer's IP:" peerip
+		read -e -p "Enter the Peer's IP: " peerip
 		WaitForNetwork $peerip
 		server+=($peerip)
 	done

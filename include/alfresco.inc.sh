@@ -32,56 +32,6 @@ function InstallAlfresco() {
 		$SUDO curl -# -o $ALF_HOME/addons/alfresco-mmt.jar $BASE_DOWNLOAD/scripts/alfresco-mmt.jar
 	  fi
 
-	  $SUDO mkdir -p $ALF_HOME/scripts
-	  if [ ! -f "$ALF_HOME/scripts/mariadb.sh" ]; then
-		echo "Downloading mariadb.sh install and setup script..."
-		$SUDO curl -# -o $ALF_HOME/scripts/mariadb.sh $BASE_DOWNLOAD/scripts/mariadb.sh
-	  fi
-	  if [ ! -f "$ALF_HOME/scripts/postgresql.sh" ]; then
-		echo "Downloading postgresql.sh install and setup script..."
-		$SUDO curl -# -o $ALF_HOME/scripts/postgresql.sh $BASE_DOWNLOAD/scripts/postgresql.sh
-	  fi
-	  if [ ! -f "$ALF_HOME/scripts/limitconvert.sh" ]; then
-		echo "Downloading limitconvert.sh script..."
-		$SUDO curl -# -o $ALF_HOME/scripts/limitconvert.sh $BASE_DOWNLOAD/scripts/limitconvert.sh
-	  fi
-	  if [ ! -f "$ALF_HOME/scripts/createssl.sh" ]; then
-		echo "Downloading createssl.sh script..."
-		$SUDO curl -# -o $ALF_HOME/scripts/createssl.sh $BASE_DOWNLOAD/scripts/createssl.sh
-	  fi
-	  if [ ! -f "$ALF_HOME/scripts/libreoffice.sh" ]; then
-		echo "Downloading libreoffice.sh script..."
-		$SUDO curl -# -o $ALF_HOME/scripts/libreoffice.sh $BASE_DOWNLOAD/scripts/libreoffice.sh
-		$SUDO sed -i "s/@@LOCALESUPPORT@@/$LOCALESUPPORT/g" $ALF_HOME/scripts/libreoffice.sh
-	  fi
-	  if [ ! -f "$ALF_HOME/scripts/iptables.sh" ]; then
-		echo "Downloading iptables.sh script..."
-		$SUDO curl -# -o $ALF_HOME/scripts/iptables.sh $BASE_DOWNLOAD/scripts/iptables.sh
-	  fi
-	  if [ ! -f "$ALF_HOME/scripts/alfresco-iptables.conf" ]; then
-		echo "Downloading alfresco-iptables.conf upstart script..."
-		$SUDO curl -# -o $ALF_HOME/scripts/alfresco-iptables.conf $BASE_DOWNLOAD/scripts/alfresco-iptables.conf
-	  fi
-	  if [ ! -f "$ALF_HOME/scripts/ams.sh" ]; then
-		echo "Downloading maintenance shutdown script..."
-		$SUDO curl -# -o $ALF_HOME/scripts/ams.sh $BASE_DOWNLOAD/scripts/ams.sh
-	  fi
-	  if [ ! -f "$ALF_HOME/scripts/remote-script.sh" ]; then
-		echo "Downloading script to install remotly ..."
-		$SUDO curl -# -o $ALF_HOME/scripts/remote-script.sh $BASE_DOWNLOAD/scripts/remote-script.sh
-	  fi
-	  if [ ! -f "$ALF_HOME/scripts/glusterfs.sh" ]; then
-		echo "Downloading script to install glusterfs ..."
-		$SUDO curl -# -o $ALF_HOME/scripts/glusterfs.sh $BASE_DOWNLOAD/scripts/glusterfs.sh
-	  fi
-	  if [ ! -f "$ALF_HOME/scripts/jasig-cas.sh" ]; then
-		echo "Downloading script to install jasig cas ..."
-		$SUDO curl -# -o $ALF_HOME/scripts/jasig-cas.sh $BASE_DOWNLOAD/scripts/jasig-cas.sh
-	  fi
-
-	  
-	  $SUDO chmod u+x $ALF_HOME/scripts/*.sh
-
 	  # Keystore
 	  $SUDO mkdir -p $ALF_HOME/alf_data/keystore
 	  # Only check for precesence of one file, assume all the rest exists as well if so.
@@ -236,5 +186,26 @@ function InstallAlfresco() {
 		fi
 	else
 		echored "FTP Server disabled !"
+	fi
+}
+
+function UpdateAlfrescoGlobalProperties() {
+	echoblue "Update alfresco-global.properties"
+	if [ "$installpsql" = "y" ]; then
+		sed -i.bak "s/db.username=.*/db.username=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/db.password=.*/db.password=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/db.name=.*/db.name=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/db.host=.*/db.host=$psqlserver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+							
+		sed -i.bak "s/db.driver=com.mysql.jdbc.Driver/#db.driver=com.mysql.jdbc.Driver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/#db.driver=org.postgresql.Driver/db.driver=org.postgresql.Driver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+				
+		sed -i.bak "s/db.port=3306/#db.port=3306/g"  $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/#db.port=5432/db.port=5432/g"  $CATALINA_BASE/shared/classes/alfresco-global.properties
+					
+		sed -i.bak "s/db.url=jdbc:mysql.*/#db.url=jdbc:mysql/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s;#db.url=jdbc:postgresql.*;db.url=jdbc:postgresql://${db.host}:${db.port}/${db.name};g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+			
+		sed -i.bak "s/db.pool.validate.query=.*/#db.pool.validate.query=/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	fi
 }

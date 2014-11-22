@@ -9,9 +9,11 @@
 
 
 function AskForMysqlServer() {
+	echo	
 }
 
 function InstallMysqlServer() {
+	echo
 }
 
 function InstallMysqlJBDC() {

@@ -11,7 +11,7 @@
 export BASE_DOWNLOAD=https://raw.githubusercontent.com/dixinfor/alfresco-debian-install/master
 export INC_DOWNLOAD=$BASE_DOWNLOAD/include
 
-declare -a DEPENDENCIES=(alfresco.inc.sh apt.inc.sh cas.inc.sh check_external_files.inc.sh glusterfs.inc.sh imagemagick.inc.sh install_utilities.inc.sh java.inc.sh libreoffice.inc.sh mysql.inc.sh nginx.inc.sh postgresql.inc.sh swftools.inc.sh tomcat.inc.sh waitfornetwork.inc.sh)
+declare -a DEPENDENCIES=(alfresco.inc.sh apt.inc.sh cas.inc.sh external_files.inc.sh glusterfs.inc.sh imagemagick.inc.sh install_utilities.inc.sh java.inc.sh libreoffice.inc.sh mysql.inc.sh nginx.inc.sh postgresql.inc.sh swftools.inc.sh tomcat.inc.sh waitfornetwork.inc.sh)
 
 export KEYSTOREBASE=http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/keystore
 
@@ -181,6 +181,7 @@ fi
 
 # Check if remote files are available
 CheckRemoteFiles
+RetrieveExecutionScripts
 
 # Update APT sources.list
 UpdateAPTSource
@@ -233,7 +234,9 @@ AskForImageMagick
 AskForSwfTools
 InstallAlfresco
 
+UpdateAlfresoGlobalProperties
 AskForCAS
+
 
 $SUDO chown -R $ALF_USER:$ALF_GROUP $CATALINA_HOME
 
