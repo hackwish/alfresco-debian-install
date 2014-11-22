@@ -8,6 +8,9 @@
 # -------
 
 export BASE_DOWNLOAD=https://raw.githubusercontent.com/dixinfor/alfresco-debian-install/master
+export INC_DOWNLOAD=$BASE_DOWNLOAD/include
+
+declare -a DEPENDENCIES=(alfresco.inc.sh apt.inc.sh cas.inc.sh check_remote_files.inc.sh glusterfs.inc.sh imagemagick.inc.sh install_utilities.inc.sh libreoffice.inc.sh nginx.inc.sh openjdk.inc.sh postgresql.inc.sh swftools.inc.sh tomcat.inc.sh waitfornetwork.inc.sh)
 
 export KEYSTOREBASE=http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/keystore
 
@@ -125,14 +128,30 @@ fi
 
 # Retrieve Dependancy and source it
 cd $INCLUDEFOLDER
-wget -r $BASE_DOWNLOAD/include
+URLERROR=0
 
-for dependency in * ; do
-  if [ -f "$dependency" ] ; then
-    . "$dependency"
-  fi
-done
+for DEPENDENCY in ${DEPENDENCIES[@]}
+	do
+		FILE="$INC_DOWNLOAD/$DEPENDENCY"
+		echo "check remote file: $FILE"
+		wget --spider $FILE  >& /dev/null
+		if [ $? != 0 ]
+		then
+			echored "In alfinstall.sh, please fix this URL: $FILE"
+			URLERROR=1
+		else
+			$SUDO curl -# -o $INCLUDEFOLDER/$DEPENDENCY $FILE
+			. $INCLUDEFOLDER/$DEPENDENCY
+		fi
+	done
 
+	if [ $URLERROR = 1 ]
+	then
+		echo
+		echored "Please fix the above errors and rerun."
+		echo
+		exit
+	fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
