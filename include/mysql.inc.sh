@@ -16,6 +16,17 @@ function InstallMysqlServer() {
 	echo
 }
 
+function AskForMySQLJBDC() {
+	if [ "$installmysql" = "y" ]; then
+		InstallMysqlJBDC()
+	else
+		read -e -p "Install MySQL JDBC Connector${ques} [y/n] " -i "n" installmyjbdc
+		if [ "$installmyjbdc" = "y" ]; then
+			InstallMysqlJBDC()
+		fi
+	fi
+}
+
 function InstallMysqlJBDC() {
 	if [ "$usepack" = "y" ]; then
 		$SUDO apt-get $APTVERBOSITY install libmysql-java

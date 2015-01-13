@@ -102,7 +102,10 @@ TMPFOLDER="/tmp/alfinstall"
 INCLUDEFOLDER="$TMPFOLDER/include"
 
 if [ -d $TMPFOLDER ]; then
-	rm -rf $TMPFOLDER
+	read -e -p "Temp folder already exist, delete it${ques} [y/n] " -i "y" deletetmp
+	if [ "$deletetmp" = "y" ]; then
+		rm -rf $TMPFOLDER
+	fi
 fi
 
 mkdir -p $TMPFOLDER
@@ -145,26 +148,27 @@ fi
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo "Check and download dependencies."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-		
-cd $INCLUDEFOLDER
-URLERROR=0
 
-for DEPENDENCY in ${DEPENDENCIES[@]}
-	do
-		FILE="$INC_DOWNLOAD/$DEPENDENCY"
-		echo "check remote file: $FILE"
-		wget --spider $FILE  >& /dev/null
-		if [ $? != 0 ]
-		then
-			echored "In alfinstall.sh, please fix this URL: $FILE"
-			URLERROR=1
-		else
-			echo "Downloading $DEPENDENCY ..."
-			$SUDO curl -# -o $INCLUDEFOLDER/$DEPENDENCY $FILE
-			. $INCLUDEFOLDER/$DEPENDENCY
-			echogreen "$DEPENDENCY downloaded !"
-		fi
-	done
+read -e -p "Do you want to update local file${ques} [y/n] " -i "y" updatefile
+if [ "$updatefile" = "y" ]; then
+	cd $INCLUDEFOLDER
+	URLERROR=0
+
+	for DEPENDENCY in ${DEPENDENCIES[@]}
+		do
+			FILE="$INC_DOWNLOAD/$DEPENDENCY"
+			echo "check remote file: $FILE"
+			wget --spider $FILE  >& /dev/null
+			if [ $? != 0 ]
+			then
+				echored "In alfinstall.sh, please fix this URL: $FILE"
+				URLERROR=1
+			else
+				echo "Downloading $DEPENDENCY ..."
+				$SUDO curl -# -o $INCLUDEFOLDER/$DEPENDENCY $FILE
+				echogreen "$DEPENDENCY downloaded !"
+			fi
+		done
 
 	if [ $URLERROR = 1 ]
 	then
@@ -173,7 +177,14 @@ for DEPENDENCY in ${DEPENDENCIES[@]}
 		echo
 		exit
 	fi
+fi
 
+for DEPENDENCY in ${DEPENDENCIES[@]}
+	do
+		. $INCLUDEFOLDER/$DEPENDENCY
+		echogreen "$DEPENDENCY loaded !"
+	done
+	
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo "Installing Method ..."
@@ -213,7 +224,9 @@ InstallUtilities
 # Remote Alfresco Services
 AskForGlusterFSServer
 AskForPostgresqlServer
-AskForMysqlServer 
+AskForMysqlServer
+AskForPostgresqlJBDC
+AskForMysqlJBDC
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"

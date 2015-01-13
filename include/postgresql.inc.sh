@@ -87,6 +87,17 @@ function InstallPostgresqlServer() {
 		fi
 }
 
+function AskForPostgresqlJBDC() {
+	if [ "$installpsql" = "y" ]; then
+		InstallPostgresqlJBDC()
+	else
+		read -e -p "Install Postgres JDBC Connector${ques} [y/n] " -i "n" installpgjbdc
+		if [ "$installpgjbdc" = "y" ]; then
+			InstallPostgresqlJBDC()
+		fi
+	fi
+}
+
 function InstallPostgresqlJBDC() {
 	if [ "$usepack" = "y" ]; then
 		$SUDO apt-get $APTVERBOSITY install libpostgresql-jdbc-java

@@ -15,6 +15,7 @@ function InstallAlfresco() {
 	  $SUDO mkdir -p $ALF_HOME/addons/war
 	  $SUDO mkdir -p $ALF_HOME/addons/share
 	  $SUDO mkdir -p $ALF_HOME/addons/alfresco
+	  
 	  if [ ! -f "$ALF_HOME/addons/apply.sh" ]; then
 		echo "Downloading apply.sh script..."
 		$SUDO curl -# -o $ALF_HOME/addons/apply.sh $BASE_DOWNLOAD/scripts/apply.sh
@@ -69,12 +70,6 @@ function InstallAlfresco() {
 	echogreen "Downloading alfresco and share war files..."
 	$SUDO curl -# -o $ALF_HOME/addons/war/alfresco.war $ALFREPOWAR
 	$SUDO curl -# -o $ALF_HOME/addons/war/share.war $ALFSHAREWAR
-
-  
-	# $SUDO curl -# -o $TMPFOLDER/war/alfwar.zip $ALFWARZIP
-	# unzip -q -j alfwar.zip
-	# $SUDO cp $TMPFOLDER/war/*.war $ALF_HOME/addons/war/
-	# $SUDO rm -rf $TMPFOLDER/war
 
 	  cd $TMPFOLDER
 	  read -e -p "Add Google docs integration${ques} [y/n] " -i "y" installgoogledocs
@@ -159,7 +154,7 @@ function InstallAlfresco() {
 			cd $ALF_HOME/solr4
 		
 			echogreen "Downloading solr4.war file..."
-			$SUDO curl -# -o $CATALINA_HOME/webapps/solr4.war $SOLR4WAR
+			$SUDO curl -# -o $CATALINA_BASE/webapps/solr4.war $SOLR4WAR
 		
 			echogreen "Downloading config file..."
 			$SUDO curl -# -o $ALF_HOME/solr4/solrconfig.zip $SOLR4CONFIG
@@ -170,38 +165,38 @@ function InstallAlfresco() {
 
 			echogreen "Configuring..."
 			# Make sure dir exist
-			$SUDO mkdir -p $CATALINA_HOME/conf/Catalina/localhost
-			$SUDO mkdir -p $ALF_DATA_HOME/solr4
-			$SUDO mkdir -p $TMP_INSTALL
+			$SUDO mkdir -p $CATALINA_CONF/Catalina/localhost
+			$SUDO mkdir -p $ALF_HOME/alf_data/solr4
+			$SUDO mkdir -p $TMPFOLDER
 
 			# Remove old config if exists
-			if [ -f "$CATALINA_HOME/conf/Catalina/localhost/solr.xml" ]; then
-				$SUDO rm $CATALINA_HOME/conf/Catalina/localhost/solr.xml
+			if [ -f "$CATALINA_CONF/Catalina/localhost/solr.xml" ]; then
+				$SUDO rm $CATALINA_CONF/Catalina/localhost/solr.xml
 			fi		
 			
 			# Set the solr data path
-			SOLRDATAPATH="$ALF_DATA_HOME/solr4"
+			SOLRDATAPATH="$ALF_HOME/alf_data/solr4"
 			# Escape for sed
 			SOLRDATAPATH="${SOLRDATAPATH//\//\\/}"
 
 			$SUDO mv $ALF_HOME/solr4/workspace-SpacesStore/conf/solrcore.properties $ALF_HOME/solr4/workspace-SpacesStore/conf/solrcore.properties.orig
 			$SUDO mv $ALF_HOME/solr4/archive-SpacesStore/conf/solrcore.properties $ALF_HOME/solr4/archive-SpacesStore/conf/solrcore.properties.orig
-			sed "s/@@ALFRESCO_SOLR4_DATA_DIR@@/$SOLRDATAPATH/g" $ALF_HOME/solr4/workspace-SpacesStore/conf/solrcore.properties.orig >  $TMP_INSTALL/solrcore.properties
-			$SUDO mv  $TMP_INSTALL/solrcore.properties $ALF_HOME/solr4/workspace-SpacesStore/conf/solrcore.properties
-			sed "s/@@ALFRESCO_SOLR4_DATA_DIR@@/$SOLRDATAPATH/g" $ALF_HOME/solr4/archive-SpacesStore/conf/solrcore.properties.orig >  $TMP_INSTALL/solrcore.properties
-			$SUDO mv  $TMP_INSTALL/solrcore.properties $ALF_HOME/solr4/archive-SpacesStore/conf/solrcore.properties
+			sed "s/@@ALFRESCO_SOLR4_DATA_DIR@@/$SOLRDATAPATH/g" $ALF_HOME/solr4/workspace-SpacesStore/conf/solrcore.properties.orig >  $TMPFOLDER/solrcore.properties
+			$SUDO mv  $TMPFOLDER/solrcore.properties $ALF_HOME/solr4/workspace-SpacesStore/conf/solrcore.properties
+			sed "s/@@ALFRESCO_SOLR4_DATA_DIR@@/$SOLRDATAPATH/g" $ALF_HOME/solr4/archive-SpacesStore/conf/solrcore.properties.orig >  $TMPFOLDER/solrcore.properties
+			$SUDO mv  $TMPFOLDER/solrcore.properties $ALF_HOME/solr4/archive-SpacesStore/conf/solrcore.properties
 
-			echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" > $TMP_INSTALL/solr4.xml
-			echo "<Context debug=\"0\" crossContext=\"true\">" >> $TMP_INSTALL/solr4.xml
-			echo "  <Environment name=\"solr/home\" type=\"java.lang.String\" value=\"$ALF_HOME/solr4\" override=\"true\"/>" >> $TMP_INSTALL/solr4.xml
-			echo "  <Environment name=\"solr/model/dir\" type=\"java.lang.String\" value=\"$ALF_HOME/solr4/alfrescoModels\" override=\"true\"/>" >> $TMP_INSTALL/solr4.xml
-			echo "  <Environment name=\"solr/content/dir\" type=\"java.lang.String\" value=\"$ALF_DATA_HOME/solr4\" override=\"true\"/>" >> $TMP_INSTALL/solr4.xml
-			echo "</Context>" >> $TMP_INSTALL/solr4.xml
-			$SUDO mv $TMP_INSTALL/solr4.xml $CATALINA_HOME/conf/Catalina/localhost/solr4.xml
+			echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" > $TMPFOLDER/solr4.xml
+			echo "<Context debug=\"0\" crossContext=\"true\">" >> $TMPFOLDER/solr4.xml
+			echo "  <Environment name=\"solr/home\" type=\"java.lang.String\" value=\"$ALF_HOME/solr4\" override=\"true\"/>" >> $TMPFOLDER/solr4.xml
+			echo "  <Environment name=\"solr/model/dir\" type=\"java.lang.String\" value=\"$ALF_HOME/solr4/alfrescoModels\" override=\"true\"/>" >> $TMPFOLDER/solr4.xml
+			echo "  <Environment name=\"solr/content/dir\" type=\"java.lang.String\" value=\"$ALF_HOME/alf_data/solr4\" override=\"true\"/>" >> $TMPFOLDER/solr4.xml
+			echo "</Context>" >> $TMPFOLDER/solr4.xml
+			$SUDO mv $TMPFOLDER/solr4.xml $CATALINA_CONF/Catalina/localhost/solr4.xml
 
 			echogreen "Setting permissions..."
-			$SUDO chown -R $ALF_USER:$ALF_GROUP $CATALINA_HOME/webapps
-			$SUDO chown -R $ALF_USER:$ALF_GROUP $ALF_DATA_HOME/solr4
+			$SUDO chown -R $ALF_USER:$ALF_GROUP $CATALINA_BASE/webapps
+			$SUDO chown -R $ALF_USER:$ALF_GROUP $ALF_HOME/alf_data/solr4
 			$SUDO chown -R $ALF_USER:$ALF_GROUP $ALF_HOME/solr4
 
 			echo

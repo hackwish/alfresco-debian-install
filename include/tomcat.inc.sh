@@ -65,6 +65,7 @@ function InstallTomcat() {
 	echo "Downloading tomcat configuration files..."
 	$SUDO curl -# -o $CATALINA_CONF/server.xml $BASE_DOWNLOAD/tomcat-alfresco/server.xml
 	$SUDO curl -# -o $CATALINA_CONF/catalina.properties $BASE_DOWNLOAD/tomcat-alfresco/catalina.properties
+	$SUDO curl -# -o $CATALINA_CONF/tomcat-users.xml $BASE_DOWNLOAD/tomcat-alfresco/tomcat-users.xml
 
 	# Create /shared
 	$SUDO mkdir -p $CATALINA_BASE/shared/classes/alfresco/extension
