@@ -46,8 +46,8 @@ export SWFTOOLS=http://www.swftools.org/swftools-2013-04-09-1007.tar.gz
 # export SOLRCONFIG=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr4/5.0.b/alfresco-solr4-5.0.b-config-ssl.zip
 # export SOLRWAR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr4/5.0.b/alfresco-solr4-5.0.b-ssl.war
 
-ALFRESCOVERSION="5.0.a"
-GOOGLEDOCSVERSION="2.0.7"
+ALFRESCOVERSION="5.0.c"
+GOOGLEDOCSVERSION="2.0.8"
 
 export ALFREPOWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco/$ALFRESCOVERSION/alfresco-$ALFRESCOVERSION.war"
 export ALFSHAREWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/share/$ALFRESCOVERSION/share-$ALFRESCOVERSION.war"
@@ -58,6 +58,9 @@ export GOOGLEDOCSSHARE="https://artifacts.alfresco.com/nexus/service/local/repo_
 
 export SOLRCONFIG="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr/$ALFRESCOVERSION/alfresco-solr-$ALFRESCOVERSION-config.zip"
 export SOLRWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr/$ALFRESCOVERSION/alfresco-solr-$ALFRESCOVERSION.war"
+export SOLR4CONFIG="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr4/$ALFRESCOVERSION/alfresco-solr4-$ALFRESCOVERSION-config-ssl.zip"
+export SOLR4WAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr4/$ALFRESCOVERSION/alfresco-solr4-$ALFRESCOVERSION-ssl.war"
+
 
 export APTVERBOSITY="-qq -y"
 

@@ -107,12 +107,13 @@ function InstallAlfresco() {
 	echo
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo "Install Solr indexing engine."
+	echo " => Alfresco 5 introduce Solr4, used it instead of this version (check next choice)"
 	echo "You have a choice lucene (default) or Solr as indexing engine."
 	echo "Solr runs as a separate application and is slightly more complex to configure."
 	echo "As Solr is more advanced and handle multilingual better it is recommended that"
 	echo "you install Solr."
 	echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	read -e -p "Install Solr indexing engine${ques} [y/n] " -i "y" installsolr
+	read -e -p "Install Solr indexing engine${ques} [y/n] " -i "n" installsolr
 	if [ "$installsolr" = "y" ]; then
 
 	  $SUDO mkdir -p $ALF_HOME/solr
@@ -144,8 +145,6 @@ function InstallAlfresco() {
 
 	  # Remove some unused stuff
 	  $SUDO rm $ALF_HOME/solr/solr.zip
-
-	  sed -i.bak -e "s/index.subsystem.name=.*/index.subsystem.name=solr/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	  
 	  echo
 	  echogreen "Finished installing Solr engine."
@@ -153,8 +152,69 @@ function InstallAlfresco() {
 	else
 	  echo
 	  echo "Skipping installing Solr."
-	  echo "You can always install Solr at a later time."
 	  echo
+	  read -e -p "Install Solr 4 indexing engine${ques} [y/n] " -i "n" installsolr4
+	  if [ "$installsolr4" = "y" ]; then
+			$SUDO mkdir -p $ALF_HOME/solr4
+			cd $ALF_HOME/solr4
+		
+			echogreen "Downloading solr4.war file..."
+			$SUDO curl -# -o $CATALINA_HOME/webapps/solr4.war $SOLR4WAR
+		
+			echogreen "Downloading config file..."
+			$SUDO curl -# -o $ALF_HOME/solr4/solrconfig.zip $SOLR4CONFIG
+		
+			echogreen "Expanding config file..."
+			$SUDO unzip -q solrconfig.zip
+			$SUDO rm solrconfig.zip
+
+			echogreen "Configuring..."
+			# Make sure dir exist
+			$SUDO mkdir -p $CATALINA_HOME/conf/Catalina/localhost
+			$SUDO mkdir -p $ALF_DATA_HOME/solr4
+			$SUDO mkdir -p $TMP_INSTALL
+
+			# Remove old config if exists
+			if [ -f "$CATALINA_HOME/conf/Catalina/localhost/solr.xml" ]; then
+				$SUDO rm $CATALINA_HOME/conf/Catalina/localhost/solr.xml
+			fi		
+			
+			# Set the solr data path
+			SOLRDATAPATH="$ALF_DATA_HOME/solr4"
+			# Escape for sed
+			SOLRDATAPATH="${SOLRDATAPATH//\//\\/}"
+
+			$SUDO mv $ALF_HOME/solr4/workspace-SpacesStore/conf/solrcore.properties $ALF_HOME/solr4/workspace-SpacesStore/conf/solrcore.properties.orig
+			$SUDO mv $ALF_HOME/solr4/archive-SpacesStore/conf/solrcore.properties $ALF_HOME/solr4/archive-SpacesStore/conf/solrcore.properties.orig
+			sed "s/@@ALFRESCO_SOLR4_DATA_DIR@@/$SOLRDATAPATH/g" $ALF_HOME/solr4/workspace-SpacesStore/conf/solrcore.properties.orig >  $TMP_INSTALL/solrcore.properties
+			$SUDO mv  $TMP_INSTALL/solrcore.properties $ALF_HOME/solr4/workspace-SpacesStore/conf/solrcore.properties
+			sed "s/@@ALFRESCO_SOLR4_DATA_DIR@@/$SOLRDATAPATH/g" $ALF_HOME/solr4/archive-SpacesStore/conf/solrcore.properties.orig >  $TMP_INSTALL/solrcore.properties
+			$SUDO mv  $TMP_INSTALL/solrcore.properties $ALF_HOME/solr4/archive-SpacesStore/conf/solrcore.properties
+
+			echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" > $TMP_INSTALL/solr4.xml
+			echo "<Context debug=\"0\" crossContext=\"true\">" >> $TMP_INSTALL/solr4.xml
+			echo "  <Environment name=\"solr/home\" type=\"java.lang.String\" value=\"$ALF_HOME/solr4\" override=\"true\"/>" >> $TMP_INSTALL/solr4.xml
+			echo "  <Environment name=\"solr/model/dir\" type=\"java.lang.String\" value=\"$ALF_HOME/solr4/alfrescoModels\" override=\"true\"/>" >> $TMP_INSTALL/solr4.xml
+			echo "  <Environment name=\"solr/content/dir\" type=\"java.lang.String\" value=\"$ALF_DATA_HOME/solr4\" override=\"true\"/>" >> $TMP_INSTALL/solr4.xml
+			echo "</Context>" >> $TMP_INSTALL/solr4.xml
+			$SUDO mv $TMP_INSTALL/solr4.xml $CATALINA_HOME/conf/Catalina/localhost/solr4.xml
+
+			echogreen "Setting permissions..."
+			$SUDO chown -R $ALF_USER:$ALF_GROUP $CATALINA_HOME/webapps
+			$SUDO chown -R $ALF_USER:$ALF_GROUP $ALF_DATA_HOME/solr4
+			$SUDO chown -R $ALF_USER:$ALF_GROUP $ALF_HOME/solr4
+
+			echo
+			echogreen "Finished installing Solr4 engine."
+			echored "Verify your setting in alfresco-global.properties."
+			echo "Set property value index.subsystem.name=solr4"
+			echo
+		else
+		  echo
+		  echo "Skipping installing Solr4."
+		  echo "You can always install Solr4 at a later time."
+		  echo
+		fi
 	fi
 
 	$SUDO chown -R $ALF_USER:$ALF_USER $ALF_HOME
@@ -163,6 +223,10 @@ function InstallAlfresco() {
 	fi
 
 	read -e -p "Enable Alfresco IMAP Server ${ques} [y/n] " -i "y" enableimap
+	if [ "enableimap" = "y" ]; then
+		read -e -p "On which interface (eth0) ${ques}" -i "eth0" ifmap
+	fi
+
 	read -e -p "Keep default port for CIFS ? [y/n] " -i "y" cifsports
 	read -e -p "Enable FTP Server ? [y/n] " -i "y" enableftp
 	
@@ -175,10 +239,17 @@ function InstallAlfresco() {
 
 function UpdateAlfrescoGlobalProperties() {
 	echoblue "Update alfresco-global.properties"
+	
+	# Manage DIR ROOT
+	echogreen "SET dir.root parameters"
+	sed -i.bak "s;dir.root=/opt/alfresco/alf_data;dir.root=$ALF_HOME/alf_data;g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+	
+	# Manage PSQL Configuration
 	if [ "$installpsql" = "y" ]; then
-		sed -i.bak "s/db.username=.*/db.username=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		sed -i.bak "s/db.password=.*/db.password=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		sed -i.bak "s/db.name=.*/db.name=alfresco/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		echogreen "Set PSQL parameters"
+		sed -i.bak "s/db.username=.*/db.username=$ALFRESCOUSER/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/db.password=.*/db.password=$ALFRESCOPWD/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/db.name=.*/db.name=$ALFRESCODB/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 		sed -i.bak "s/db.host=.*/db.host=$psqlserver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 							
 		sed -i.bak "s/db.driver=com.mysql.jdbc.Driver/#db.driver=com.mysql.jdbc.Driver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
@@ -187,41 +258,70 @@ function UpdateAlfrescoGlobalProperties() {
 		sed -i.bak "s/db.port=3306/#db.port=3306/g"  $CATALINA_BASE/shared/classes/alfresco-global.properties
 		sed -i.bak "s/#db.port=5432/db.port=5432/g"  $CATALINA_BASE/shared/classes/alfresco-global.properties
 					
-		sed -i.bak "s/db.url=jdbc:mysql.*/#db.url=jdbc:mysql/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
-		sed -i.bak "s;#db.url=jdbc:postgresql.*;db.url=jdbc:postgresql://${db.host}:${db.port}/${db.name};g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s;#db.url=.*;db.url=jdbc:postgresql://${db.host}:${db.port}/${db.name};g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 			
 		sed -i.bak "s/db.pool.validate.query=.*/#db.pool.validate.query=/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	fi
 	
-	if [ "$enableimap" = "y" ]; then
-		read -e -p "On which interface (eth0) ${ques}" -i "eth0" ifmap
-		bindimap=`ifconfig $ifmap | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+	# Manage MySQL Configuration
+	if [ "$installmysql" = "y" ]; then
+		echogreen "Set MySQL parameters"
+		sed -i.bak "s/db.username=.*/db.username=$ALFRESCOUSER/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/db.password=.*/db.password=$ALFRESCOPWD/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/db.name=.*/db.name=$ALFRESCODB/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/db.host=.*/db.host=$psqlserver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+							
+		sed -i.bak "s/db.driver=.*/db.driver=com.mysql.jdbc.Driver/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/db.port=.*/#db.port=3306/g"  $CATALINA_BASE/shared/classes/alfresco-global.properties
 		
+		sed -i.bak "s;db.url=.*;db.url=jdbc:mysql://${db.host}:${db.port}/${db.name}?useUnicode=yes&characterEncoding=UTF-8;g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+		sed -i.bak "s/db.pool.validate.query=.*/db.pool.validate.query=select 1/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+	fi
+	
+	# Manage IMAP
+	if [ "$enableimap" = "y" ]; then
+		echogreen "Set IMAP parameters"
+		bindimap=`ifconfig $ifmap | grep -Eo 'inet (adr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
 		sed -i.bak "s/#imap.server.enabled=.*/imap.server.enabled=true/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 		sed -i.bak "s/#imap.server.port=.*/imap.server.port=143/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 		sed -i.bak "s/#imap.server.host=.*/imap.server.host=$bindimap/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	fi
 
+	# Manage CIFS
 	if [ "$cifsports" = "y" ]; then
+		echogreen "Set CIFS parameters"
 		sed -i.bak -e "s/cifs.tcpipSMB.port=1445/cifs.tcpipSMB.port=445/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 		sed -i.bak -e "s/cifs.netBIOSSMB.sessionPort=1139/cifs.netBIOSSMB.sessionPort=139/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 		sed -i.bak -e "s/cifs.netBIOSSMB.namePort=1137/cifs.netBIOSSMB.namePort=137/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 		sed -i.bak -e "s/cifs.netBIOSSMB.datagramPort=1138/cifs.netBIOSSMB.datagramPort=1138/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	fi
 
+	# Manage FTP
 	if [ "$enableftp" = "y" ]; then
+		echogreen "Set FTP parameters"
 		sed -i.bak -e "s/ftp.enabled=false/ftp.enabled=true/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 		if [ "$ftpports" = "y" ]; then
 			sed -i.bak -e "s/ftp.port=2021/ftp.port=21/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 		else
-			echored "Keep ports providing by Loftusab !";
+			echored "Keep ports providing by Loftuxab !";
 		fi
 	else
 		echored "FTP Server disabled !"
 	fi
 
+	# Manage LibreOffice
 	if [ "$installibreoffice" = "y" ]; then
+		echogreen "Set LibreOffice parameters"
 		sed -i.bak -e "s;ooo.exe=.*;ooo.exe=$OOOEXE;g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+	fi
+	
+	# Manager Solr/Solr4
+	if [ "$installsolr" = "y" ]; then
+		echogreen "Set SOLR parameters"
+		sed -i.bak -e "s/index.subsystem.name=.*/index.subsystem.name=solr/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
+	elif [ "$installsolr4" = "y" ]; then
+		echogreen "Set SOLR parameters"
+		sed -i.bak -e "s/index.subsystem.name=.*/index.subsystem.name=solr4/g" $CATALINA_BASE/shared/classes/alfresco-global.properties
 	fi
 
 }
