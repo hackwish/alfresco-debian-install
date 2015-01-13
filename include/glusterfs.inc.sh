@@ -29,7 +29,7 @@ function InstallGlusterFSServer() {
 	server=()
 	echo
 	read -e -p "How many remote server to install in the GlusterFS Cluster${ques} [1] " -i "1" glustercount
-	for (( i = 0 ; i < $glustercount ; i++ )) do
+	for (( i=0 ; i<$glustercount ; i++ )) do
 		read -e -p "Enter the Peer's IP: " peerip
 		WaitForNetwork $peerip
 		server+=($peerip)
@@ -114,7 +114,7 @@ function InstallGlusterFSServer() {
 		
 	echogreen "Number of peers found:  ${#server[@]}"
 
-	for (( i = ${#server[@]}; i > 0 ; i-- )) do
+	for (( i=${#server[@]}; i>0 ; i-- )) do
 		if [[ $i -eq 1 ]]
 		then
 			echogreen "Execute GlusterFS Server Installation Script on 'Master' Server: ${server[$i-1]}"
