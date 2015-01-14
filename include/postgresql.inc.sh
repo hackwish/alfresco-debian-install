@@ -89,20 +89,20 @@ function InstallPostgresqlServer() {
 
 function AskForPostgresqlJBDC() {
 	if [ "$installpsql" = "y" ]; then
-		InstallPostgresqlJBDC()
+		InstallPostgresqlJBDC
 	else
-		read -e -p "Install Postgres JDBC Connector${ques} [y/n] " -i "n" installpgjbdc
-		if [ "$installpgjbdc" = "y" ]; then
-			InstallPostgresqlJBDC()
-		fi
-	fi
+	    read -e -p "Install Postgres JDBC Connector${ques} [y/n] " -i "n" installpgjbdc
+	    if [ "$installpgjbdc" = "y" ]; then
+		    InstallPostgresqlJBDC
+	    fi
+    fi
 }
 
 function InstallPostgresqlJBDC() {
 	if [ "$usepack" = "y" ]; then
 		$SUDO apt-get $APTVERBOSITY install libpostgresql-jdbc-java
 		ln -s /usr/share/java/postgresql.jar /usr/share/tomcat7/lib/postgresql.jar
-	else
+    else
 		curl -# -O $JDBCPOSTGRESURL/$JDBCPOSTGRES
 		$SUDO mv $JDBCPOSTGRES $CATALINA_HOME/lib
 	fi

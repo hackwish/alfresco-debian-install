@@ -18,11 +18,11 @@ function InstallMysqlServer() {
 
 function AskForMySQLJBDC() {
 	if [ "$installmysql" = "y" ]; then
-		InstallMysqlJBDC()
+		InstallMysqlJBDC
 	else
 		read -e -p "Install MySQL JDBC Connector${ques} [y/n] " -i "n" installmyjbdc
 		if [ "$installmyjbdc" = "y" ]; then
-			InstallMysqlJBDC()
+			InstallMysqlJBDC
 		fi
 	fi
 }

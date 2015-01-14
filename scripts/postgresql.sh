@@ -119,7 +119,7 @@ psqlpath="/etc/postgresql/$psqlversion/main/pg_hba.conf"
 psqlconf="/etc/postgresql/$psqlversion/main/postgresql.conf"
 
 
-pghba="host	alfresco	alfresco	$ALFRESCOSERVER	password"
+pghba="host     $ALFRESCODB     $ALFRESCOUSER     $ALFRESCOSERVER     password"
 	
 if [ -f $psqlpath ]; then
 	echogreen "file pg_hba.conf was found! update it!"
