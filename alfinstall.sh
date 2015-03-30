@@ -46,7 +46,7 @@ export SWFTOOLS=http://www.swftools.org/swftools-2013-04-09-1007.tar.gz
 # export SOLRCONFIG=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr4/5.0.b/alfresco-solr4-5.0.b-config-ssl.zip
 # export SOLRWAR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco-solr4/5.0.b/alfresco-solr4-5.0.b-ssl.war
 
-ALFRESCOVERSION="5.0.c"
+ALFRESCOVERSION="5.0.d"
 GOOGLEDOCSVERSION="2.0.8"
 
 export ALFREPOWAR="https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco/$ALFRESCOVERSION/alfresco-$ALFRESCOVERSION.war"

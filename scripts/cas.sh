@@ -125,6 +125,7 @@ echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo "Retrieve auth-cas.conf ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+mkdir -p /var/cache/apache2/mod_auth_cas_cookies
 $SUDO curl -# -o /etc/apache2/mods-available/auth_cas.conf $BASE_DOWNLOAD/apache2/auth_cas.conf
 sed -i.bak -e "s;@@FQDN@@;$FQDN;g" /etc/apache2/mods-available/auth_cas.conf
 
@@ -176,8 +177,8 @@ echo "Downloading JASIG CAS ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 mkdir -p $JASIG_WORK
 cd $JASIG_WORK
-git clone $JASIG_GIT
-CASDIR="$JASIG_WORK/$(find -maxdepth 1 -type d -name 'cas*'| head -n1)"
+git clone https://github.com/UniconLabs/simple-cas4-overlay-template.git
+cd $JASIG_WORK/simple-cas4-overlay-template
 
 #TODO : Adjust log path
 #TODO : Configuration for LDAP
@@ -187,8 +188,8 @@ echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo "Compiling JASIG CAS ..."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-cd $CASDIR
-mvn -Dmaven.test.skip=true package install
+cd $JASIG_WORK/simple-cas4-overlay-template
+mvn clean package
 
 echo
 echo
@@ -200,7 +201,11 @@ if [ -e $CATALINA_BASE/webapps/cas.war ]; then
 	mv $CATALINA_BASE/webapps/cas.war $CATALINA_BASE/webapps/cas.war.old
 fi
 echo "Moving new cas.war to tomcat..."
-mv $CASDIR/cas-server-webapp/target/cas.war $CATALINA_BASE/webapps/cas.war
+mv $JASIG_WORK/simple-cas4-overlay-template/target/cas.war $CATALINA_BASE/webapps/cas.war
+
+mkdir -p /etc/cas
+cp $JASIG_WORK/simple-cas4-overlay-template/etc/cas.properties /etc/cas/cas.properties
+cp $JASIG_WORK/simple-cas4-overlay-template/etc/log4j.xml /etc/cas/log4j.xml
 
 echo
 echo
